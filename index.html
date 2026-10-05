@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolsa Inmobiliaria Acierta Max — Propiedades compartidas en la Zona Metropolitana de Guadalajara</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bolsa Inmobiliaria Acierta Max — Propiedades compartidas en la Zona Metropolitana de Guadalajara">
+<meta property="og:description" content="Miles de casas, departamentos, terrenos y locales en venta y renta en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco, del inventario compartido entre inmobiliarias profesionales. Te acompaña Acierta Max.">
+<meta property="og:image" content="https://bolsa.aciertamax.com/assets/verifica/hero-termografia.jpg">
+<meta property="og:url" content="https://bolsa.aciertamax.com/">
+<meta property="og:site_name" content="Acierta Max">
+<meta property="og:locale" content="es_MX">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bolsa Inmobiliaria Acierta Max — Propiedades compartidas en la Zona Metropolitana de Guadalajara">
+<meta name="twitter:description" content="Miles de casas, departamentos, terrenos y locales en venta y renta en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco, del inventario compartido entre inmobiliarias profesionales. Te acompaña Acierta Max.">
+<meta name="twitter:image" content="https://bolsa.aciertamax.com/assets/verifica/hero-termografia.jpg">
+<meta name="description" content="Miles de casas, departamentos, terrenos y locales en venta y renta en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco, del inventario compartido entre inmobiliarias profesionales. Te acompaña Acierta Max.">
+<meta name="description" content="Miles de casas, departamentos, terrenos y locales en venta y renta en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco, del inventario compartido entre inmobiliarias profesionales. Te acompaña Acierta Max.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="pin"></span>Acierta<b>Max</b></div>
+    <nav class="header-nav">
+      <a href="mapa.html">Buscar por zona 🗺️</a>
+      <a href="#" id="navVenderRentar">Vender o rentar mi propiedad 📣</a>
+      <a href="/blog/">Blog</a>
+    </nav>
+    <a class="header-cta" href="https://wa.me/523333777337?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener">Habla con MAX →</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Bolsa Inmobiliaria · Inventario compartido entre inmobiliarias profesionales</div>
+    <h1>No solo encuentres una propiedad. <em>Encuentra certeza.</em></h1>
+    <p>Miles de opciones en venta y renta de las inmobiliarias que comparten su inventario en Guadalajara, con el acompañamiento de Acierta Max en cada paso: crédito, notario y documentación.</p>
+
+    <div class="toggles-fila">
+      <div class="op-toggle" id="segToggle" role="group" aria-label="Tipo de inmueble">
+        <button data-seg="vivienda" class="active">🏠 Vivienda</button>
+        <button data-seg="comercial">🏢 Comercial</button>
+      </div>
+      <div class="op-toggle" id="opToggle" role="group" aria-label="Venta o renta">
+        <button data-op="" class="active">Todas</button>
+        <button data-op="VENTA">Venta</button>
+        <button data-op="RENTA">Renta</button>
+      </div>
+    </div>
+
+    <div class="search-panel">
+      <div class="field field-wide">
+        <label for="fTexto">Colonia o palabra clave</label>
+        <input type="text" id="fTexto" list="listaColonias" placeholder="Ej. Providencia, Valle Real, Coto...">
+        <datalist id="listaColonias"></datalist>
+      </div>
+      <div class="field">
+        <label for="fMunicipio">Municipio</label>
+        <select id="fMunicipio">
+          <option value="">Toda la ZMG</option>
+          <option value="Guadalajara">Guadalajara</option>
+          <option value="Zapopan">Zapopan</option>
+          <option value="Tlaquepaque">Tlaquepaque</option>
+          <option value="Tonalá">Tonalá</option>
+          <option value="Tlajomulco de Zúñiga">Tlajomulco</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fTipo">Tipo</label>
+        <select id="fTipo">
+          <option value="">Cualquiera</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fPrecioMax">Precio máximo</label>
+        <select id="fPrecioMax">
+          <option value="">Sin límite</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fRecamaras">Recámaras</label>
+        <select id="fRecamaras">
+          <option value="">Cualquiera</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5+</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fBanos">Baños mín.</label>
+        <select id="fBanos">
+          <option value="">Cualquiera</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fM2Min">m² mínimo</label>
+        <input type="number" id="fM2Min" placeholder="Ej. 100">
+      </div>
+      <div class="field">
+        <label for="fM2Max">m² máximo</label>
+        <input type="number" id="fM2Max" placeholder="Ej. 300">
+      </div>
+      <div class="field">
+        <label for="fNiveles">Niveles</label>
+        <select id="fNiveles">
+          <option value="">Cualquiera</option>
+          <option value="1">1 planta</option>
+          <option value="2">2 plantas</option>
+          <option value="3">3+ plantas</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fOrden">Ordenar por</label>
+        <select id="fOrden">
+          <option value="precio_asc">Precio: menor a mayor</option>
+          <option value="precio_desc">Precio: mayor a menor</option>
+          <option value="m2_desc">m²: mayor a menor</option>
+        </select>
+      </div>
+      <button class="search-btn" id="btnBuscar">Buscar</button>
+    </div>
+    <label class="chk-fotos"><input type="checkbox" id="fFotoPrimero" checked> Mostrar primero las propiedades que tienen foto</label>
+  </div>
+</section>
+
+<div class="stats-strip" id="statsStrip"></div>
+
+<section class="results-section">
+  <div class="results-header">
+    <h2>Propiedades disponibles</h2>
+    <div class="results-count" id="resultsCount"></div>
+  </div>
+  <div id="grid" class="grid">
+    <div class="loader">Cargando inventario…</div>
+  </div>
+  <button class="load-more" id="loadMore" style="display:none;">Ver más propiedades</button>
+</section>
+
+<section class="coaching">
+  <div class="coaching-inner">
+    <div>
+      <div class="coaching-eyebrow">Lo que nos distingue</div>
+      <h2>No vendemos anuncios.<br>Acompañamos tu proceso completo.</h2>
+      <p>Precalificación de crédito e Infonavit, selección de notario, qué exige PROFECO, cómo recibir tu propiedad — coaching real de principio a fin, con 20 años de experiencia ejecutiva respaldando cada paso.</p>
+      <a class="coaching-cta" href="https://wa.me/523333777337?text=Hola%2C%20quiero%20que%20me%20acompa%C3%B1en%20en%20todo%20el%20proceso" target="_blank" rel="noopener">Empieza tu proceso con MAX</a>
+    </div>
+    <div class="coaching-steps">
+      <div class="coaching-step">
+        <div class="num">01</div>
+        <div><h4>Presupuesto y crédito</h4><p>Sabemos exactamente qué te alcanza antes de que te enamores de algo que no puedes pagar.</p></div>
+      </div>
+      <div class="coaching-step">
+        <div class="num">02</div>
+        <div><h4>Búsqueda guiada</h4><p>No te mandamos una lista genérica — acotamos contigo hasta encontrar lo correcto.</p></div>
+      </div>
+      <div class="coaching-step">
+        <div class="num">03</div>
+        <div><h4>Oferta y documentación</h4><p>Te decimos exactamente qué va a pedir el banco o Infonavit, sin sorpresas.</p></div>
+      </div>
+      <div class="coaching-step">
+        <div class="num">04</div>
+        <div><h4>Cierre con certeza</h4><p>Notario calificado, requisitos de PROFECO y NOM, y cómo recibir tu propiedad correctamente.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  "name": "Acierta Max",
+  "url": "https://bolsa.aciertamax.com/",
+  "logo": "https://bolsa.aciertamax.com/assets/logo/acierta-max-logo.png",
+  "telephone": "+52-33-3377-7337",
+  "areaServed": [
+    {"@type": "City", "name": "Guadalajara"},
+    {"@type": "City", "name": "Zapopan"},
+    {"@type": "City", "name": "Tlaquepaque"},
+    {"@type": "City", "name": "Tonalá"},
+    {"@type": "City", "name": "Tlajomulco de Zúñiga"}
+  ],
+  "address": {"@type": "PostalAddress", "addressLocality": "Guadalajara", "addressRegion": "Jalisco", "addressCountry": "MX"},
+  "memberOf": {"@type": "Organization", "name": "AMPI (Asociación Mexicana de Profesionales Inmobiliarios)"}
+}
+</script>
+<footer class="site-footer">
+  <strong>Acierta Max</strong> · Profesionales Inmobiliarios · Zona Metropolitana de Guadalajara<br>
+  Socio AMPI · Inventario compartido entre inmobiliarias; información y disponibilidad sujetas a confirmación<br>
+  <a href="aviso-privacidad.html" style="color:inherit">Aviso de privacidad</a>
+</footer>
+
+<script src="js/comun.js"></script>
+<script src="app.js"></script>
+<script>
+document.getElementById('navVenderRentar').addEventListener('click', function (e) {
+  e.preventDefault();
+  const texto = 'Hola, quiero información para vender o rentar mi propiedad con Acierta Max.';
+  const lanzar = lead => window.open('https://wa.me/523333777337?text=' + encodeURIComponent(texto) + (lead && lead.vendedor ? encodeURIComponent(` (folio ${lead.folio})`) : ''), '_blank', 'noopener');
+  if (AM.leadGuardado()) { lanzar(AM.leadGuardado()); return; }
+  AM.asegurarLead({ motivo: 'Para que un asesor de Acierta Max te contacte sobre tu propiedad.' }).then(lanzar);
+});
+</script>
+</body>
+</html>

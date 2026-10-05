@@ -9,7 +9,7 @@ import requests
 
 FUENTE = "https://raw.githubusercontent.com/javiermendosalinas-afk/acierta-pro-web/main/herramientas/neojaus/neojaus.json"
 SITIO = "https://inmobiliaria.pro"
-MUNICIPIOS = ["Guadalajara", "Tlajomulco de Zúñiga", "Tlaquepaque", "Tonalá", "Zapopan"]
+MUNICIPIOS = ["Guadalajara", "Tlajomulco de Zúñiga", "Tlaquepaque", "Tonalá", "Zapopan", "El Salto"]
 
 def main():
     try:

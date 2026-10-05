@@ -1,1 +1,16 @@
-{"actualizado": null, "total": 0, "municipios": ["Guadalajara","Tlajomulco de Zúñiga","Tlaquepaque","Tonalá","Zapopan"]}
+{
+ "actualizado": "2026-10-05T23:05:58+00:00",
+ "total": 6147,
+ "por_segmento": {
+  "comercial": 1170,
+  "vivienda": 4977
+ },
+ "municipios": [
+  "Guadalajara",
+  "Tlajomulco de Zúñiga",
+  "Tlaquepaque",
+  "Tonalá",
+  "Zapopan",
+  "El Salto"
+ ]
+}

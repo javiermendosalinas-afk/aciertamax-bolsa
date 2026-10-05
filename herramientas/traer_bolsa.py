@@ -24,7 +24,7 @@ def main():
         print(f"[FRENO] La bolsa trae {len(datos)} fichas (antes {len(previo)}): se conserva el inventario vigente")
         return 0
     for d in datos:
-        d["liga"] = f"{SITIO}/ficha.html?eb={d['eb']}&op={'R' if d['operacion'] == 'RENTA' else 'V'}"
+        d["liga"] = f"{SITIO}/ficha.html?eb={d['eb']}&op={d['operacion']}"
     datos.sort(key=lambda f: (f["operacion"], f["municipio"], -(f.get("precio") or 0)))
     with open("data.json", "w", encoding="utf-8") as fh:
         json.dump(datos, fh, ensure_ascii=False, separators=(",", ":"))

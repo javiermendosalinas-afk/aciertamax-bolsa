@@ -1,4 +1,4 @@
-# Bolsa Inmobiliaria Acierta Max · bolsa.aciertamax.com
+# Bolsa Inmobiliaria Acierta Max · inmobiliaria.pro
 
 Sitio aparte de acierta.pro (decisión de Javier, 5-oct-2026) con el inventario compartido de
 NeoJaus (bolsa de AMPI, MIO, PAIS y Cámara de Comercio) en los 5 municipios de la ZMG.

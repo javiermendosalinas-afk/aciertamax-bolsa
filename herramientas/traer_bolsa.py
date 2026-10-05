@@ -1,6 +1,6 @@
 """Trae el inventario de la bolsa NeoJaus que genera el repo acierta-pro-web
 (herramientas/neojaus/neojaus.json) y lo publica como data.json de este sitio,
-con la liga de cada ficha apuntando a bolsa.aciertamax.com.
+con la liga de cada ficha apuntando a inmobiliaria.pro.
 Si la descarga falla o viene casi vacía, se conserva el inventario vigente."""
 import json, os, sys
 from collections import Counter
@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 import requests
 
 FUENTE = "https://raw.githubusercontent.com/javiermendosalinas-afk/acierta-pro-web/main/herramientas/neojaus/neojaus.json"
-SITIO = "https://bolsa.aciertamax.com"
+SITIO = "https://inmobiliaria.pro"
 MUNICIPIOS = ["Guadalajara", "Tlajomulco de Zúñiga", "Tlaquepaque", "Tonalá", "Zapopan"]
 
 def main():

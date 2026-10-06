@@ -417,7 +417,7 @@
   // ── Compartir una ficha (WhatsApp a un tercero / correo) ──────
   AM.compartirHTML = function (titulo, url) {
     const id = 'sh' + Math.random().toString(36).slice(2, 8);
-    const texto = `Mira esta propiedad que encontré en Acierta Max: ${titulo} — ${url}`;
+    const texto = `Mira esta propiedad que encontré en inmobiliaria.pro: ${titulo} — ${url}`;
     return `<div class="compartir" id="${id}">
       <button type="button" class="btn-compartir" data-compartir="${id}">📤 Compartir esta ficha</button>
       <div class="compartir-ops" id="${id}-ops" style="display:none">
@@ -430,7 +430,7 @@
     const b = e.target.closest('[data-compartir]');
     if (b) {
       const ops = document.getElementById(b.dataset.compartir + '-ops'); if (!ops) return;
-      if (navigator.share) { navigator.share({ title: 'Acierta Max', text: b.closest('.compartir').dataset.texto || '', url: location.href }).catch(() => {}); }
+      if (navigator.share) { navigator.share({ title: 'inmobiliaria.pro', text: b.closest('.compartir').dataset.texto || '', url: location.href }).catch(() => {}); }
       else ops.style.display = ops.style.display === 'none' ? 'flex' : 'none';
       return;
     }

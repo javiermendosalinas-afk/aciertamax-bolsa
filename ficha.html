@@ -3,26 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ficha de propiedad | Acierta Max</title>
+<title>Ficha de propiedad | inmobiliaria.pro</title>
 <meta property="og:type" content="website">
-<meta property="og:title" content="Ficha de propiedad | Acierta Max">
+<meta property="og:title" content="Ficha de propiedad | inmobiliaria.pro">
 <meta property="og:description" content="Precio, análisis de zona, mapa y propiedades similares — mira el detalle completo de esta propiedad en Acierta Max, Guadalajara.">
-<meta property="og:image" content="https://inmobiliaria.pro/assets/verifica/hero-termografia.jpg">
+<meta property="og:image" content="https://inmobiliaria.pro/assets/marca/og-inmobiliaria-pro.jpg">
 <meta property="og:url" content="https://inmobiliaria.pro/ficha.html">
-<meta property="og:site_name" content="Acierta Max">
+<meta property="og:site_name" content="inmobiliaria.pro">
 <meta property="og:locale" content="es_MX">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ficha de propiedad | Acierta Max">
+<meta name="twitter:title" content="Ficha de propiedad | inmobiliaria.pro">
 <meta name="twitter:description" content="Precio, análisis de zona, mapa y propiedades similares — mira el detalle completo de esta propiedad en Acierta Max, Guadalajara.">
-<meta name="twitter:image" content="https://inmobiliaria.pro/assets/verifica/hero-termografia.jpg">
+<meta name="twitter:image" content="https://inmobiliaria.pro/assets/marca/og-inmobiliaria-pro.jpg">
 <meta name="description" content="Precio, análisis de zona, mapa y propiedades similares — mira el detalle completo de esta propiedad en Acierta Max, Guadalajara.">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/marca/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/marca/favicon-48.png">
+<link rel="apple-touch-icon" href="assets/marca/apple-touch-icon.png">
+<meta name="theme-color" content="#13233A">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="pg">
 
 <div class="pg-header">
-  <a href="index.html" class="back">← Acierta Max</a>
+  <a href="index.html" class="back" aria-label="inmobiliaria.pro, inicio">← <img src="assets/marca/logo-oscuro.png" alt="inmobiliaria.pro" width="134" height="26"></a>
   <span class="pg-titulo">Ficha de propiedad</span>
   <a href="mapa.html" class="pg-link">Buscar por zona</a>
 </div>
@@ -83,7 +89,7 @@
   }
 
   function pintar(p, todas) {
-    document.title = p.titulo + ' — Acierta Max';
+    document.title = p.titulo + ' — inmobiliaria.pro';
     const an = AM.analisis(p, todas);
     const url = AM.fichaUrl(p);
     const wa = encodeURIComponent('Hola, me interesa esta propiedad: ' + p.titulo + ' (' + p.eb + ', ' + (p.operacion === 'RENTA' ? 'renta' : 'venta') + ') — ' + location.origin + '/' + url);

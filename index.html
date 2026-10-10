@@ -16,7 +16,6 @@
 <meta name="twitter:description" content="Miles de casas, departamentos, terrenos y locales en venta y renta en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco, del inventario compartido entre inmobiliarias profesionales. Te acompaña Acierta Max.">
 <meta name="twitter:image" content="https://inmobiliaria.pro/assets/marca/og-inmobiliaria-pro.jpg">
 <meta name="description" content="Miles de casas, departamentos, terrenos y locales en venta y renta en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco, del inventario compartido entre inmobiliarias profesionales. Te acompaña Acierta Max.">
-<meta name="description" content="Miles de casas, departamentos, terrenos y locales en venta y renta en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco, del inventario compartido entre inmobiliarias profesionales. Te acompaña Acierta Max.">
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/marca/favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="assets/marca/favicon-48.png">
@@ -44,7 +43,7 @@
   <div class="hero-inner">
     <div class="hero-eyebrow">Solo inmobiliarios profesionales · Zona Metropolitana de Guadalajara</div>
     <h1>No solo encuentres una propiedad. <em>Encuentra certeza.</em></h1>
-    <p>Miles de opciones en venta y renta de las inmobiliarias que comparten su inventario en Guadalajara, con el acompañamiento de Acierta Max en cada paso: crédito, notario y documentación.</p>
+    <p>Miles de opciones en venta y renta de las inmobiliarias que comparten su inventario en Guadalajara, con el acompañamiento de asesores profesionales en cada paso: crédito, notario y documentación. Y Sofía y Diego te explican cada una como amigos.</p>
 
     <div class="toggles-fila">
       <div class="op-toggle" id="segToggle" role="group" aria-label="Tipo de inmueble">
@@ -223,10 +222,10 @@
 <script>
 document.getElementById('navVenderRentar').addEventListener('click', function (e) {
   e.preventDefault();
-  const texto = 'Hola, quiero información para vender o rentar mi propiedad con Acierta Max.';
+  const texto = 'Hola, quiero información para vender o rentar mi propiedad con inmobiliaria.pro.';
   const lanzar = lead => window.open('https://wa.me/523333777337?text=' + encodeURIComponent(texto) + (lead && lead.vendedor ? encodeURIComponent(` (folio ${lead.folio})`) : ''), '_blank', 'noopener');
   if (AM.leadGuardado()) { lanzar(AM.leadGuardado()); return; }
-  AM.asegurarLead({ motivo: 'Para que un asesor de Acierta Max te contacte sobre tu propiedad.' }).then(lanzar);
+  AM.asegurarLead({ motivo: 'Para que un asesor profesional te contacte sobre tu propiedad.' }).then(lanzar);
 });
 </script>
 </body>

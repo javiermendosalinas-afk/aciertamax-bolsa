@@ -455,7 +455,7 @@
     return `<div class="am-modal-fondo" id="amModalFondo"><div class="am-modal">
       <button type="button" class="am-modal-cerrar" id="amModalCerrar" aria-label="Cerrar">✕</button>
       <h3>Un momento antes de continuar</h3>
-      <p class="muted">${AM.esc(motivo || 'Para que un asesor de Acierta Max te dé seguimiento, compártenos tus datos.')}</p>
+      <p class="muted">${AM.esc(motivo || 'Para que un asesor te dé seguimiento, compártenos tus datos.')}</p>
       <label>Tu nombre</label><input type="text" id="amNombre" maxlength="80">
       <label>Tu WhatsApp (10 dígitos)</label><input type="tel" id="amWa" inputmode="numeric" maxlength="20">
       <div id="amVerifWA"></div>

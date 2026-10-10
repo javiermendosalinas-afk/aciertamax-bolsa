@@ -315,7 +315,7 @@ document.querySelectorAll('.bq-ops').forEach(g=>g.addEventListener('click',e=>{t
 document.querySelectorAll('.bq-tabs button').forEach(x=>x.onclick=()=>tab(x.dataset.tab));
 $('bqTope').addEventListener('input',e=>{tocado=true;est.tope=+e.target.value;mostrar=24;pintar();});
 mapa=LF.map('bqMapa',{scrollWheelZoom:false}).setView([20.67,-103.38],11);
-LF.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(mapa);capa=LF.layerGroup().addTo(mapa);
+LF.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapa);capa=LF.layerGroup().addTo(mapa);
 const q=new URLSearchParams(location.hash.slice(1));const verMapa=q.get('vista')==='mapa';['o','g','m'].forEach(k=>{if(q.has(k))est[k]=q.get(k)});if(q.has('r'))est.r=+q.get('r');if(q.has('tope'))est.tope=+q.get('tope');
 document.querySelectorAll('.bq-ops').forEach(g=>{const c=g.dataset.campo;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',String(b.dataset.v)===String(est[c])))});
 fetch('/presupuesto/buscador.json').then(r=>r.json()).then(j=>{D=j;if(verMapa){tab('mapa');setTimeout(()=>{document.getElementById('bqMapa').scrollIntoView({block:'center'});},300);}const gr={};D.forEach(p=>{const v=pm2(p);if(v)(gr[p.m+p.g+p.o]=gr[p.m+p.g+p.o]||[]).push(v)});for(const k in gr)ref[k]=med(gr[k]);pintar();});

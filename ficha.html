@@ -106,7 +106,7 @@ Promise.all([fetch('/presupuesto/buscador.json').then(r=>r.json()).catch(()=>[])
   </div></div>`;
  $('fi').querySelectorAll('.fi-gal img').forEach(im=>im.onclick=()=>visor(fotos,+im.dataset.i));const t=$('todas');if(t)t.onclick=()=>visor(fotos,0);
  const mas=$('mas');if(mas)mas.onclick=()=>{$('desc').classList.remove('corta');mas.remove();};
- if(p.a){const LF=window.L;const mp=LF.map('fiMapa',{scrollWheelZoom:false}).setView([p.a,p.n],15);LF.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(mp);
+ if(p.a){const LF=window.L;const mp=LF.map('fiMapa',{scrollWheelZoom:false}).setView([p.a,p.n],15);LF.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mp);
   LF.marker([p.a,p.n],{icon:LF.divIcon({className:'',html:'<div class="pin-casa"><span>🏠</span></div>',iconSize:[34,34],iconAnchor:[17,34]})}).addTo(mp);}
  const b=$('barra');b.hidden=false;b.innerHTML=`<a class="quiero" href="/te-acompanamos.html?fav=${encodeURIComponent(p.e)}&op=${renta?'renta':'compra'}">♥ Quiero verla</a><a class="wa" href="https://wa.me/523333777337?text=${encodeURIComponent('Hola, me interesa esta propiedad de inmobiliaria.pro: '+p.x+' ('+p.e+') '+location.href)}" target="_blank" rel="noopener">WhatsApp</a>`;
 });

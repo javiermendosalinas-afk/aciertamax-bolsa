@@ -159,7 +159,7 @@ function progreso(p,txt){$('riel').style.width=Math.min(100,p)+'%';$('rielTxt').
 // ---------- cálculos ----------
 const grupo={casa:'c',departamento:'d',terreno:'t'};
 function coinciden(tope){if(!DATA)return[];const g=grupo[S.tipo],o=S.operacion==='renta'?'R':'V';
- return DATA.filter(p=>p.o===o&&p.g===g&&(!S.municipio||S.municipio==='cualquiera'||p.m===S.municipio)&&p.p<=tope&&(g==='t'||!S.recamaras||p.r>=S.recamaras));}
+ return DATA.filter(p=>p.o===o&&p.g===g&&enZona(p)&&p.p<=tope&&(g==='t'||!S.recamaras||p.r>=S.recamaras));}
 const mediana=a=>{a=a.slice().sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:0};
 function precalificar(){const ing=num(S.ingresos)+num(S.ingreso_extra),eng=num(S.enganche),r=TASA/12,MESES=(S.plazo||20)*12;let mens=0,credito=0,alcance=0;
  if(S.operacion==='renta'){alcance=ing/3;return{mensualidad:0,credito:0,alcance};}
@@ -228,8 +228,33 @@ const PASOS=[
   opciones(ops,v=>{S.motivo=(ops.find(o=>o[0]===v)||['',''])[1].replace(/^\S+\s/,'');sig();});},
  ()=>{if(S.uso!=='vivir')return sig(true);progreso(20,'Para quién');decir('Diego','¿Quiénes van a vivir ahí? Así sé cuánto espacio buscar.','D');
   opciones([['solo','🙋 Yo solo(a)'],['pareja','💑 En pareja'],['familia','👨‍👩‍👧 Familia con hijos'],['roomies','👯 Con roomies']],v=>{S.para_quien=v;sig();});},
- ()=>{progreso(26,'La zona');decir('Diego','¿Por dónde te late? Cada municipio tiene lo suyo: Zapopan tiene más oferta, en Tlajomulco rinde más el m² y Guadalajara te deja cerca de todo.','D');
-  opciones([...MUNI.map(m=>[m,m.replace(' de Zúñiga','')]),['cualquiera','📍 Me da igual']],v=>{S.municipio=v;sig();});},
+ ()=>{progreso(26,'Dónde vivir');cargarDatos().then(()=>{
+  decir('Diego','¿Dónde te gustaría vivir? <strong>Toca en el mapa el lugar</strong> y te marco un círculo; los puntitos son las opciones que hay. Si quieres, primero toca un municipio para acercarte.','D');
+  const w=document.createElement('div');w.className='mapa-ac';w.innerHTML='<div id="acMapa"></div><div class="cinta" id="acCinta">Toca el mapa donde te gustaría vivir 🏠</div>';$('chat').appendChild(w);
+  const LF=window.L,o=S.operacion==='renta'?'R':'V',g=grupo[S.tipo];
+  const disp=(DATA||[]).filter(p=>p.o===o&&p.g===g&&p.a);
+  const c0=[20.66,-103.39];
+  const mp=LF.map('acMapa',{scrollWheelZoom:false}).setView(c0,11);
+  const chips=document.createElement('div');chips.className='resp';chips.style.marginTop='6px';chips.innerHTML=MUNI.map(m=>`<button type="button" data-mun="${esc(m)}">${esc(m.replace(' de Zúñiga',''))}</button>`).join('');w.after(chips);
+  chips.querySelectorAll('[data-mun]').forEach(b=>b.onclick=()=>{const l=disp.filter(p=>p.m===b.dataset.mun);if(l.length){mp.setView([mediana(l.map(p=>p.a)),mediana(l.map(p=>p.n))],12.5);}chips.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));});
+  LF.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mp);
+  disp.slice(0,1500).forEach(p=>LF.circleMarker([p.a,p.n],{radius:3.5,weight:0,fillColor:'#E07812',fillOpacity:.7}).addTo(mp));
+  let casa=null,circ=null,trab=null,modo='casa';const r=$('resp');r.className='resp';
+  const cuenta=()=>{if(!circ)return;const n=disp.filter(p=>km(S.zona.lat,S.zona.lon,p.a,p.n)<=S.zona.r).length;$('acCinta').innerHTML=modo==='casa'?`Dentro de tu círculo hay <b style="color:#E07812">${n} opciones</b>`:'Ahora toca donde trabajas o estudias 💼';};
+  const pintarResp=()=>{r.innerHTML=modo==='casa'?`<div style="flex-basis:100%;font-weight:700">Tamaño del círculo: <span id="rk">${S.zona?S.zona.r:3} km</span></div><input type="range" id="rr" min="1" max="8" step="0.5" value="${S.zona?S.zona.r:3}" aria-label="Radio"><button type="button" class="prim" id="okz" ${S.zona?'':'disabled'}>Aquí quiero vivir</button>`
+    :`<button type="button" class="prim" id="okt" ${trab?'':'disabled'}>Ahí trabajo / estudio</button><button type="button" id="casa">🏠 Trabajo desde casa</button><button type="button" id="varia">🔀 Varía</button>`;
+   if(modo==='casa'){$('rr').oninput=e=>{if(!S.zona)return;S.zona.r=+e.target.value;$('rk').textContent=S.zona.r+' km';circ.setRadius(S.zona.r*1000);cuenta();};
+    $('okz').onclick=()=>{const dentro=disp.filter(p=>km(S.zona.lat,S.zona.lon,p.a,p.n)<=S.zona.r),n=dentro.length;const porMun={};dentro.forEach(p=>porMun[p.m]=(porMun[p.m]||0)+1);
+     S.municipio=Object.keys(porMun).sort((a,b)=>porMun[b]-porMun[a])[0]||'cualquiera';yo(`Aquí, en un radio de ${S.zona.r} km (${n} opciones)`);
+     if(n<3){S.zona.r=Math.min(12,S.zona.r+3);circ.setRadius(S.zona.r*1000);decir('Diego',`Ahí hay pocas opciones; amplié tu círculo a ${S.zona.r} km para que tengas de dónde escoger.`,'DL');}
+     modo='trab';cuenta();pintarResp();chips.remove();decir('Sofía','¿Y dónde trabajas o estudias? Tócalo en el mapa y califico cada casa por la distancia real.','S');bajar();};}
+   else{$('okt').onclick=()=>{chips.remove();yo('Trabajo / estudio ahí 💼');S.zona_diaria=`${S.trabajo.lat.toFixed(4)},${S.trabajo.lon.toFixed(4)}`;r.innerHTML='';sig();};
+    $('casa').onclick=()=>{chips.remove();yo('Trabajo desde casa');S.trabajo=null;S.zona_diaria='casa';r.innerHTML='';sig();};$('varia').onclick=()=>{chips.remove();yo('Varía');S.trabajo=null;S.zona_diaria='varia';r.innerHTML='';sig();};}};
+  mp.on('click',e=>{const {lat,lng}=e.latlng;if(modo==='casa'){S.zona={lat,lon:lng,r:S.zona?S.zona.r:3};if(casa){casa.setLatLng(e.latlng);circ.setLatLng(e.latlng);}else{casa=LF.marker(e.latlng,{icon:LF.divIcon({className:'',html:'<div class="mk-casa">🏠</div>',iconSize:[30,30],iconAnchor:[15,28]})}).addTo(mp);circ=LF.circle(e.latlng,{radius:S.zona.r*1000,color:'#13233A',weight:2,fillColor:'#F5A04A',fillOpacity:.15}).addTo(mp);}
+    window.Juego&&Juego.sfx('pop');cuenta();pintarResp();}
+   else{S.trabajo={lat,lon:lng};if(trab)trab.setLatLng(e.latlng);else trab=LF.marker(e.latlng,{icon:LF.divIcon({className:'',html:'<div class="mk-trab">💼</div>',iconSize:[30,30],iconAnchor:[15,28]})}).addTo(mp);
+    window.Juego&&Juego.sfx('pop');$('acCinta').innerHTML=`💼 A ${km(S.zona.lat,S.zona.lon,lat,lng).toFixed(1)} km de donde quieres vivir`;pintarResp();}});
+  pintarResp();setTimeout(()=>mp.invalidateSize(),100);bajar();});},
  ()=>{if(S.tipo==='terreno')return sig(true);progreso(32,'El espacio');decir('Sofía','¿Cuántas recámaras necesitas como mínimo?','S');
   opciones([['1','1'],['2','2'],['3','3'],['4','4 o más']],v=>{S.recamaras=+v;sig();});},
  ()=>{progreso(38,'Lo indispensable');decir('Diego','¿Qué no puede faltar? Marca todo lo que aplique.','D');
@@ -248,7 +273,7 @@ const PASOS=[
   const pintar=()=>{S.presupuesto=+$('rg').value;$('mt').textContent=din(S.presupuesto)+(renta?'/mes':'');cargarDatos().then(()=>{const l=coinciden(S.presupuesto);$('cuantas').textContent=l.length?`Hay ${l.length} opciones que encajan con lo que me has dicho.`:'Con esto aún no encuentro opciones; súbele tantito.';});};
   $('rg').oninput=pintar;pintar();$('ok').onclick=()=>{yo(din(S.presupuesto)+(renta?' al mes':''));r.innerHTML='';
    cargarDatos().then(()=>{const l=coinciden(S.presupuesto);const m=mediana(l.map(p=>p.p));
-    if(l.length){window.Juego&&Juego.logro(`Explorador: ${l.length} opciones para ti`,'🔎');dato(`<b>${l.length} opciones</b><span>${S.tipo==='casa'?'casas':S.tipo==='departamento'?'depas':'terrenos'} en ${esc(S.municipio==='cualquiera'?'la zona metropolitana':S.municipio)} de hasta ${din(S.presupuesto)}${renta?'/mes':''}. La mitad cuesta menos de ${din(m)}.</span>`);}
+    if(l.length){window.Juego&&Juego.logro(`Explorador: ${l.length} opciones para ti`,'🔎');dato(`<b>${l.length} opciones</b><span>${S.tipo==='casa'?'casas':S.tipo==='departamento'?'depas':'terrenos'} ${S.zona?'en tu zona':'en '+esc(S.municipio==='cualquiera'?'la zona metropolitana':S.municipio)} de hasta ${din(S.presupuesto)}${renta?'/mes':''}. La mitad cuesta menos de ${din(m)}.</span>`);}
     else{window.Juego&&Juego.sfx('lose');}if(!l.length)decir('Diego','Mmm… con ese presupuesto y esas características todavía no encuentro opciones. No pasa nada: tu asesor busca también fuera de nuestro inventario. Sigamos.','DP');sig();});};bajar();},
  ()=>{if(S.operacion==='renta')return sig(true);progreso(52,'Cómo pagarías');decir('Sofía','Ahora lo importante para que nadie te haga perder el tiempo: ¿cómo lo pagarías?','S');
   opciones([['banco','🏦 Crédito bancario'],['infonavit','🟥 Infonavit'],['cofinavit','🤝 Cofinavit'],['fovissste','🟩 Fovissste'],['contado','💵 De contado'],['nose','🤔 Aún no sé']],v=>{S.credito=v;sig();});},
@@ -293,30 +318,6 @@ const PASOS=[
     if(r.alcance>=S.presupuesto){window.Juego&&Juego.ganar('¡Ya te alcanza!','💰');decir('Sofía','¡Va que va! Con ese escenario tu presupuesto ya cabe. Tu asesor te ayuda a armarlo con el banco.','SC');}
     else decir('Diego',`Va, con eso te alcanzaría hasta ${din(r.alcance)}. Te muestro opciones hasta 10% arriba de eso, y tu asesor busca cómo cerrar la diferencia.`,'D');}
    else decir('Diego',`Va. Te muestro opciones hasta 10% arriba de lo que te alcanza (${din(base())}); nada que te comprometa de más.`,'D');sig();});},
- ()=>{progreso(81,'Dónde vivir');cargarDatos().then(()=>{
-  decir('Diego','Ahora en el mapa, que es más fácil que con colonias: <strong>toca donde te gustaría vivir</strong>. Los puntitos son las opciones que te alcanzan. Luego ajusta el tamaño del círculo.','D');
-  const w=document.createElement('div');w.className='mapa-ac';w.innerHTML='<div id="acMapa"></div><div class="cinta" id="acCinta">Toca el mapa donde te gustaría vivir 🏠</div>';$('chat').appendChild(w);
-  const LF=window.L,o=S.operacion==='renta'?'R':'V',g=grupo[S.tipo];
-  const disp=(DATA||[]).filter(p=>p.o===o&&p.g===g&&p.a&&p.p<=techo()&&(g==='t'||!S.recamaras||p.r>=S.recamaras));
-  const enM=disp.filter(p=>!S.municipio||S.municipio==='cualquiera'||p.m===S.municipio);const c0=enM.length?[mediana(enM.map(p=>p.a)),mediana(enM.map(p=>p.n))]:[20.67,-103.38];
-  const mp=LF.map('acMapa',{scrollWheelZoom:false}).setView(c0,S.municipio&&S.municipio!=='cualquiera'?12:11);
-  LF.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(mp);
-  disp.slice(0,1500).forEach(p=>LF.circleMarker([p.a,p.n],{radius:3.5,weight:0,fillColor:'#E07812',fillOpacity:.7}).addTo(mp));
-  let casa=null,circ=null,trab=null,modo='casa';const r=$('resp');r.className='resp';
-  const cuenta=()=>{if(!circ)return;const n=disp.filter(p=>km(S.zona.lat,S.zona.lon,p.a,p.n)<=S.zona.r).length;$('acCinta').innerHTML=modo==='casa'?`Dentro de tu círculo hay <b style="color:#E07812">${n} opciones</b> que te alcanzan`:'Ahora toca donde trabajas o estudias 💼';};
-  const pintarResp=()=>{r.innerHTML=modo==='casa'?`<div style="flex-basis:100%;font-weight:700">Tamaño del círculo: <span id="rk">${S.zona?S.zona.r:3} km</span></div><input type="range" id="rr" min="1" max="8" step="0.5" value="${S.zona?S.zona.r:3}" aria-label="Radio"><button type="button" class="prim" id="okz" ${S.zona?'':'disabled'}>Aquí quiero vivir</button>`
-    :`<button type="button" class="prim" id="okt" ${trab?'':'disabled'}>Ahí trabajo / estudio</button><button type="button" id="casa">🏠 Trabajo desde casa</button><button type="button" id="varia">🔀 Varía</button>`;
-   if(modo==='casa'){$('rr').oninput=e=>{if(!S.zona)return;S.zona.r=+e.target.value;$('rk').textContent=S.zona.r+' km';circ.setRadius(S.zona.r*1000);cuenta();};
-    $('okz').onclick=()=>{const n=disp.filter(p=>km(S.zona.lat,S.zona.lon,p.a,p.n)<=S.zona.r).length;yo(`Aquí, en un radio de ${S.zona.r} km (${n} opciones)`);
-     if(n<3){S.zona.r=Math.min(12,S.zona.r+3);circ.setRadius(S.zona.r*1000);decir('Diego',`Ahí hay pocas opciones con tu presupuesto; amplié tu círculo a ${S.zona.r} km para que tengas de dónde escoger.`,'DL');}
-     modo='trab';cuenta();pintarResp();decir('Sofía','¿Y dónde trabajas o estudias? Tócalo en el mapa y califico cada casa por la distancia real.','S');bajar();};}
-   else{$('okt').onclick=()=>{yo('Trabajo / estudio ahí 💼');S.zona_diaria=`${S.trabajo.lat.toFixed(4)},${S.trabajo.lon.toFixed(4)}`;r.innerHTML='';sig();};
-    $('casa').onclick=()=>{yo('Trabajo desde casa');S.trabajo=null;S.zona_diaria='casa';r.innerHTML='';sig();};$('varia').onclick=()=>{yo('Varía');S.trabajo=null;S.zona_diaria='varia';r.innerHTML='';sig();};}};
-  mp.on('click',e=>{const {lat,lng}=e.latlng;if(modo==='casa'){S.zona={lat,lon:lng,r:S.zona?S.zona.r:3};if(casa){casa.setLatLng(e.latlng);circ.setLatLng(e.latlng);}else{casa=LF.marker(e.latlng,{icon:LF.divIcon({className:'',html:'<div class="mk-casa">🏠</div>',iconSize:[30,30],iconAnchor:[15,28]})}).addTo(mp);circ=LF.circle(e.latlng,{radius:S.zona.r*1000,color:'#13233A',weight:2,fillColor:'#F5A04A',fillOpacity:.15}).addTo(mp);}
-    window.Juego&&Juego.sfx('pop');cuenta();pintarResp();}
-   else{S.trabajo={lat,lon:lng};if(trab)trab.setLatLng(e.latlng);else trab=LF.marker(e.latlng,{icon:LF.divIcon({className:'',html:'<div class="mk-trab">💼</div>',iconSize:[30,30],iconAnchor:[15,28]})}).addTo(mp);
-    window.Juego&&Juego.sfx('pop');$('acCinta').innerHTML=`💼 A ${km(S.zona.lat,S.zona.lon,lat,lng).toFixed(1)} km de donde quieres vivir`;pintarResp();}});
-  pintarResp();setTimeout(()=>mp.invalidateSize(),100);bajar();});},
  ()=>{progreso(82,'Tiempos');decir('Diego','¿Para cuándo te gustaría estar ya en tu nuevo lugar?','D');
   opciones([['ya','⚡ Lo antes posible'],['1a3','📆 En 1 a 3 meses'],['mas3','🔭 Más adelante, estoy explorando']],v=>{S.cuando=v;sig();});},
  ()=>{decir('Sofía','Y la decisión final, ¿la tomas tú o con alguien más? Así invitamos a quien deba estar en la visita.','S');

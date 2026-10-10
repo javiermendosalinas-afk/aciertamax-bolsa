@@ -20,7 +20,8 @@ SLUG = {"casa": "casas", "departamento": "departamentos", "terreno": "terrenos"}
 TOPES = {("casa", "VENTA"): [2e6, 3e6, 4e6, 5e6, 7e6, 10e6], ("departamento", "VENTA"): [2e6, 3e6, 4e6, 5e6, 7e6],
          ("terreno", "VENTA"): [1e6, 2e6, 3e6, 5e6], ("casa", "RENTA"): [10e3, 15e3, 20e3, 30e3, 50e3],
          ("departamento", "RENTA"): [8e3, 12e3, 15e3, 20e3, 30e3]}
-AVATAR = {"Sofía": "/assets/avatares/sofia.svg", "Diego": "/assets/avatares/diego.svg"}
+AVATAR = {"Sofía": "/assets/avatares/sofia.svg", "Diego": "/assets/avatares/diego.svg", "Sofía celebra": "/assets/avatares/sofia-celebra.svg",
+          "Sofía señala": "/assets/avatares/sofia-senala.svg", "Diego lupa": "/assets/avatares/diego-lupa.svg", "Diego pensando": "/assets/avatares/diego-pensando.svg"}
 
 
 def slug(s):
@@ -222,7 +223,7 @@ BUSCADOR = '''<link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
 <script>
 (function(){
 const LF=window.L;
-const AV={S:'/assets/avatares/sofia.svg',D:'/assets/avatares/diego.svg'};
+const AV={S:'/assets/avatares/sofia.svg',D:'/assets/avatares/diego.svg',SC:'/assets/avatares/sofia-celebra.svg',SS:'/assets/avatares/sofia-senala.svg',DL:'/assets/avatares/diego-lupa.svg',DP:'/assets/avatares/diego-pensando.svg'};
 const ZONA={'Zapopan':'Zapopan es el que más oferta tiene. Por Valle Real, Puerta de Hierro y Andares está lo más caro; hacia Tesistán y la orilla norte encuentras precios más accesibles.',
  'Guadalajara':'En Guadalajara estás cerca de todo: Providencia, Chapultepec y la Americana concentran servicios y vida de barrio; el Centro y las colonias tradicionales tienen opciones más accesibles.',
  'Tlaquepaque':'Tlaquepaque está a un paso de Guadalajara, con el encanto de su Centro; buena relación entre precio y ubicación.',
@@ -258,9 +259,9 @@ function explica(p){const k=h(p.e),el=(o,i)=>o[(k>>>(i*3))%o.length],r0=ref[p.m+
  else if(p.g==='t')tip='Antes de apartar, pide el uso de suelo y confirma que agua, luz y drenaje lleguen hasta el lote.';
  else{const r=.1013/12,n=240,m=p.p*.8*r/(1-Math.pow(1+r,-n));tip=`Con 20% de enganche (${din(p.p*.2)}), la mensualidad rondaría ${din(m)} a 20 años; te pedirían ingresos de unos ${din(m/.3)} al mes. Y antes de firmar, pide una revisión.`;}
  return{bueno:bueno.slice(0,2).join('; ')||'Vale la pena verla en persona',ojo:ojo.slice(0,2).join('; ')||'Nada raro en los datos; confírmalo en la visita',para,tip};}
-function tarjeta(p){const q=h(p.e)%2?'S':'D',n=q==='S'?'Sofía':'Diego',u='/ficha.html?eb='+encodeURIComponent(p.e)+'&op='+(p.o==='V'?'VENTA':'RENTA');
+function tarjeta(p){const X=explica(p),adv=!X.ojo.startsWith('Nada raro'),q=adv?'DL':'SS',n=adv?'Diego':'Sofía',vb=adv?'te advierte':'te explica',u='/ficha.html?eb='+encodeURIComponent(p.e)+'&op='+(p.o==='V'?'VENTA':'RENTA');
  const meta=[p.c||p.m,p.r?p.r+' rec':'',sup(p)?sup(p)+' m²':''].filter(Boolean).join(' · ');
- return `<article class="pr-card"><a class="foto" href="${u}">${p.f?`<img src="${esc(p.f)}" alt="" loading="lazy">`:''}<span class="precio">${din(p.p)}${p.o==='R'?'/mes':''}</span></a><div class="cuerpo"><a class="tit" href="${u}" style="text-decoration:none">${esc(p.x)}</a><div class="meta">📍 ${esc(meta)}</div>${(x=>`<div class="dice"><img src="${AV[q]}" alt="" width="46" height="50"><div><b>${n} te explica</b><p>👍 <b>Lo bueno:</b> ${esc(x.bueno)}.</p><p>⚠️ <b>Ojo:</b> ${esc(x.ojo)}.</p><p>🎯 <b>Para:</b> ${esc(x.para)}.</p><p class="tip">💡 ${esc(x.tip)}</p></div></div>`)(explica(p))}<a class="ver" href="${u}">Verla</a></div></article>`;}
+ return `<article class="pr-card"><a class="foto" href="${u}">${p.f?`<img src="${esc(p.f)}" alt="" loading="lazy">`:''}<span class="precio">${din(p.p)}${p.o==='R'?'/mes':''}</span></a><div class="cuerpo"><a class="tit" href="${u}" style="text-decoration:none">${esc(p.x)}</a><div class="meta">📍 ${esc(meta)}</div>${(x=>`<div class="dice"><img src="${AV[q]}" alt="" width="46" height="50"><div><b>${n} ${vb}</b><p>👍 <b>Lo bueno:</b> ${esc(x.bueno)}.</p><p>⚠️ <b>Ojo:</b> ${esc(x.ojo)}.</p><p>🎯 <b>Para:</b> ${esc(x.para)}.</p><p class="tip">💡 ${esc(x.tip)}</p></div></div>`)(X)}<a class="ver" href="${u}">Verla</a></div></article>`;}
 function rango(){const r=RANGO[est.o+est.g],s=$('bqTope');s.min=r[0];s.max=r[1];s.step=r[2];if(est.tope==null||est.tope<r[0]||est.tope>r[1])est.tope=r[3];s.value=est.tope;
  $('bqTopeTxt').textContent='Hasta '+din(est.tope)+(est.o==='R'?' al mes':'');$('bqRecPaso').style.display=$('bqRec').style.display=est.g==='t'?'none':'';}
 let mostrar=24;
@@ -269,12 +270,12 @@ function pintar(){rango();
  const clave=p=>{const r0=ref[p.m+p.g+p.o],v=pm2(p),x=v&&r0?v/r0:1.5;return x>=.55?x:3+x};
  L.sort((a,b)=>clave(a)-clave(b)||b.p-a.p);
  const tipo={c:'casas',d:'depas',t:'terrenos'}[est.g],lugar=est.m||'toda la zona metropolitana';
- if(!L.length){$('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.D}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Uy, con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto o prueba otra zona, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
+ if(!L.length){$('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.DP}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Mmm… con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto o prueba otra zona, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
  const m=med(L.map(p=>p.p)),s=med(L.map(sup)),r=med(L.filter(p=>p.r).map(p=>p.r));
  const cols={};L.forEach(p=>{if(p.c)(cols[p.c]=cols[p.c]||[]).push(p)});
  const rinde=Object.entries(cols).filter(([,l])=>l.length>=3).map(([c,l])=>[c,med(l.map(sup))/med(l.map(p=>p.p))]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
- $('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.S}" alt="" width="104" height="113"><figcaption>Sofía</figcaption></figure><div class="txt"><b class="n">SOFÍA DICE</b>¡Va! Encontré <b>${L.length} ${tipo}</b> para ${est.o==='V'?'comprar':'rentar'} en ${esc(lugar)} de hasta ${din(est.tope)}${est.o==='R'?' al mes':''}. La mitad cuesta menos de <b>${din(m)}</b>${s?` y lo típico son <b>${Math.round(s)} m²</b>`:''}${r&&est.g!=='t'?` con <b>${r} recámaras</b>`:''}.${rinde.length?` Donde más rinde tu lana: <b>${rinde.map(esc).join(', ')}</b>.`:''}</div></div>
- <div class="pr-burbuja der"><figure><img src="${AV.D}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>${esc(ZONA[est.m])} Te las puse de las que más rinden a las que menos.</div></div>`;
+ $('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.SC}" alt="" width="104" height="113"><figcaption>Sofía</figcaption></figure><div class="txt"><b class="n">SOFÍA DICE</b>¡Va! Encontré <b>${L.length} ${tipo}</b> para ${est.o==='V'?'comprar':'rentar'} en ${esc(lugar)} de hasta ${din(est.tope)}${est.o==='R'?' al mes':''}. La mitad cuesta menos de <b>${din(m)}</b>${s?` y lo típico son <b>${Math.round(s)} m²</b>`:''}${r&&est.g!=='t'?` con <b>${r} recámaras</b>`:''}.${rinde.length?` Donde más rinde tu lana: <b>${rinde.map(esc).join(', ')}</b>.`:''}</div></div>
+ <div class="pr-burbuja der"><figure><img src="${AV.D}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Ojo, ahí te va un tip: ${esc(ZONA[est.m])} Te las puse de las que más rinden a las que menos.</div></div>`;
  $('bqLista').innerHTML=L.slice(0,mostrar).map(tarjeta).join('')+(L.length>mostrar?`<div class="bq-mas"><button class="pr-cta" id="bqMas" style="border:0;cursor:pointer">Ver ${Math.min(24,L.length-mostrar)} más</button></div>`:'');
  const b=$('bqMas');if(b)b.onclick=()=>{mostrar+=24;pintar()};
  capa.clearLayers();const pts=[];L.slice(0,300).forEach((p,i)=>{if(!p.a)return;const mk=i<40?LF.marker([p.a,p.n],{zIndexOffset:i<10?1000:(40-i)*10,icon:LF.divIcon({className:'',html:`<span class="pin-precio${i<10?' top':''}">${corto(p.p)}</span>`,iconSize:null})}):LF.circleMarker([p.a,p.n],{radius:5,color:'#fff',weight:1.5,fillColor:'#E07812',fillOpacity:.85});
@@ -304,21 +305,23 @@ def cabeza(titulo, desc, canon, img=None, extra=""):
 <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/presupuesto.css">{extra}</head>
 <body style="background:#F6F7FB"><header class="site-header"><div class="header-inner">
 <a href="/"><img src="/assets/marca/logo-oscuro.png" alt="inmobiliaria.pro" style="height:34px;width:auto"></a>
-<nav class="header-nav"><a href="/presupuesto/">¿Cuánto tienes?</a><a href="/mapa.html">Mapa</a></nav>
+<nav class="header-nav"><a href="/presupuesto/">¿Cuánto tienes?</a><a href="/mapa.html">Mapa</a><a href="/sofia-y-diego.html">Sofía y Diego</a></nav>
 <a class="header-cta" href="https://wa.me/{WA}?text=Hola%2C%20vi%20una%20propiedad%20en%20inmobiliaria.pro" target="_blank" rel="noopener">Escríbenos →</a>
 </div></header><main class="pr-wrap">"""
 
 
-PIE = """<p class="pr-aviso">Sofía y Diego son asesores virtuales de inmobiliaria.pro: sus comentarios se generan con los datos publicados de cada propiedad. Precios de oferta sujetos a confirmación. Operado por Acierta Max, S.A. de C.V.</p>
+PIE = """<p class="pr-aviso"><a href="/sofia-y-diego.html">Sofía y Diego</a> son asesores virtuales de inmobiliaria.pro: sus comentarios se generan con los datos publicados de cada propiedad. Precios de oferta sujetos a confirmación. Operado por Acierta Max, S.A. de C.V.</p>
 </main><footer class="site-footer">inmobiliaria.pro · Solo inmobiliarios profesionales · Zona Metropolitana de Guadalajara · <a href="/presupuesto/">Busca por presupuesto</a></footer></body></html>"""
 
 
-def burbuja(nombre, texto, derecha=False):
-    return f'<div class="pr-burbuja{" der" if derecha else ""}"><figure><img src="{AVATAR[nombre]}" alt="{nombre}, asesor virtual" width="104" height="113"><figcaption>{nombre}</figcaption></figure><div class="txt"><b class="n">{nombre.upper()} DICE</b>{texto}</div></div>'
+def burbuja(nombre, texto, derecha=False, pose=None):
+    return f'<div class="pr-burbuja{" der" if derecha else ""}"><figure><img src="{AVATAR[pose or nombre]}" alt="{nombre}, asesor virtual" width="104" height="113"><figcaption>{nombre}</figcaption></figure><div class="txt"><b class="n">{nombre.upper()} DICE</b>{texto}</div></div>'
 
 
 def bloque_explica(q, x):
-    return (f'<div class="dice"><img src="{AVATAR[q]}" alt="{q}" width="46" height="50"><div><b>{q} te explica</b>'
+    advierte = not x["ojo"].startswith("Nada raro")
+    q, pose, verbo = ("Diego", "Diego lupa", "te advierte") if advierte else ("Sofía", "Sofía señala", "te explica")
+    return (f'<div class="dice"><img src="{AVATAR[pose]}" alt="{q}" width="46" height="50"><div><b>{q} {verbo}</b>'
             f'<p>👍 <b>Lo bueno:</b> {E(x["bueno"])}.</p><p>⚠️ <b>Ojo:</b> {E(x["ojo"])}.</p><p>🎯 <b>Para:</b> {E(x["para"])}.</p>'
             f'<p class="tip">💡 {E(x["consejo"])}</p></div></div>')
 
@@ -361,11 +364,11 @@ def pagina(muni, g, op, tope, lista, todos_muni, vecinos):
             + f"<b>{round(st['sup']) if st['sup'] else '—'} m²</b>."
             + (f" Donde más m² te dan por tu dinero: <b>{E(rinde)}</b>." if rinde else ""))
     if op == "RENTA":
-        txt2 = "Un consejo de amigo: pide el contrato por escrito, revisa qué incluye la renta (mantenimiento, agua) y nunca deposites sin conocer el inmueble y a quien lo renta."
+        txt2 = "Pide el contrato por escrito, revisa qué incluye la renta (mantenimiento, agua) y nunca deposites sin conocer el inmueble y a quien lo renta."
     elif g == "terreno":
-        txt2 = "Un consejo de amigo: antes de apartar un terreno, pide el uso de suelo y revisa que los servicios (agua, luz, drenaje) lleguen hasta el lote. Te ahorras sorpresas."
+        txt2 = "Antes de apartar un terreno, pide el uso de suelo y revisa que los servicios (agua, luz, drenaje) lleguen hasta el lote. Te ahorras sorpresas."
     else:
-        txt2 = f"Un consejo de amigo: además del precio, separa entre 5% y 8% para escrituración e impuestos. Y si te gusta una, pide una revisión antes de firmar; no es desconfianza, es cuidar tu dinero."
+        txt2 = f"Además del precio, separa entre 5% y 8% para escrituración e impuestos. Y si te gusta una, pide una revisión antes de firmar; no es desconfianza, es cuidar tu dinero."
     def rinde_clave(p):
         r = (pm2(p) / ref) if pm2(p) and ref else 1.5
         return (r if r >= 0.55 else 3 + r, -p["precio"])      # datos atípicos (más de 45% abajo) al final
@@ -382,7 +385,7 @@ def pagina(muni, g, op, tope, lista, todos_muni, vecinos):
                f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><script type="application/ld+json">{json.dumps(ld2, ensure_ascii=False)}</script>')
     h += f'<nav class="pr-migas"><a href="/">Inicio</a> › <a href="/presupuesto/">¿Cuánto tienes?</a> › {E(muni or "Toda la ZMG")}</nav>'
     h += f'<h1 class="pr-h1">{E(titulo_h1)}</h1><p class="pr-sub">Actualizado al {HOY} · te lo explicamos como amigos, con datos reales</p>'
-    h += burbuja(a1, txt1) + burbuja(a2, E(txt2), derecha=True)
+    h += burbuja("Sofía", "¡Va! " + txt1, pose="Sofía celebra") + burbuja("Diego", "Ojo, ahí te va un tip: " + E(txt2[0].lower() + txt2[1:]), derecha=True)
     h += f'''<div class="pr-datos"><div><b>{st["n"]}</b><span>opciones</span></div><div><b>{dinero(st["med"])}</b><span>precio mediano</span></div>
 <div><b>{round(st["sup"]) if st["sup"] else "—"} m²</b><span>superficie típica</span></div>{f'<div><b>{st["rec"]:g}</b><span>recámaras típicas</span></div>' if st["rec"] and g != "terreno" else ""}</div>'''
     h += '<div class="pr-chips">' + "".join(f'<a class="{"on" if t == tope else ""}" href="{url_pres(muni, g, op, t)}">Hasta ${monto_txt(t)}</a>' for t in vecinos) + "</div>"

@@ -11,6 +11,7 @@
 - [Inicio](https://inmobiliaria.pro/)
 - [¿Cuánto tienes? Búsqueda por presupuesto](https://inmobiliaria.pro/presupuesto/)
 - [Buscar en el mapa](https://inmobiliaria.pro/mapa.html)
+- [Conoce a Sofía y Diego, los asesores virtuales](https://inmobiliaria.pro/sofia-y-diego.html)
 
 ## Mapas del sitio
 - https://inmobiliaria.pro/sitemap.xml

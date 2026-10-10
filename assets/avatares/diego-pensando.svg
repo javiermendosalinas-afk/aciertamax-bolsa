@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Diego pensando">
+<g stroke="#13233A" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+<ellipse cx="120" cy="252" rx="72" ry="6" fill="#13233A" opacity=".1" stroke="none"/>
+<!-- cuerpo -->
+<path d="M66 252c0-36 22-58 54-58s54 22 54 58z" fill="#1E3A5F"/>
+<path d="M100 196l20 26 20-26" fill="#fff"/><path d="M114 204h12l4 34-10 10-10-10z" fill="#F08A24"/>
+<path d="M98 198l10 40M142 198l-10 40" stroke-width="3" fill="none"/>
+<!-- brazo pensando -->
+<path d="M150 230c10-14 12-36 4-50" fill="none" stroke-width="22" stroke="#13233A"/><path d="M150 230c10-14 12-36 4-50" fill="none" stroke-width="15" stroke="#1E3A5F"/>
+<!-- cabeza -->
+<ellipse cx="80" cy="120" rx="9" ry="14" fill="#E8AE84"/><ellipse cx="160" cy="120" rx="9" ry="14" fill="#E8AE84"/>
+<ellipse cx="120" cy="116" rx="52" ry="58" fill="#E8AE84"/>
+<!-- copete -->
+<path d="M68 104c-6-44 20-70 54-70 34 0 54 22 50 60-8-14-20-22-34-24 4 6 4 12 2 18-12-14-30-20-48-16-10 6-18 18-24 32z" fill="#2E211C"/>
+<path d="M92 46q22-14 48-4" stroke="#5A4238" stroke-width="5" fill="none"/>
+<!-- barba -->
+<path d="M70 128c2 34 22 52 50 52s48-18 50-52c-8 14-18 20-50 20s-42-6-50-20z" fill="#3E2C25"/>
+<!-- ojos -->
+<ellipse cx="98" cy="114" rx="14" ry="16" fill="#fff"/><ellipse cx="142" cy="114" rx="14" ry="16" fill="#fff"/>
+<circle cx="104" cy="110" r="8.5" fill="#4A3020" stroke="none"/><circle cx="148" cy="110" r="8.5" fill="#4A3020" stroke="none"/>
+<circle cx="104" cy="110" r="4.2" fill="#13233A" stroke="none"/><circle cx="148" cy="110" r="4.2" fill="#13233A" stroke="none"/>
+<circle cx="104" cy="112" r="3" fill="#fff" stroke="none"/><circle cx="148" cy="112" r="3" fill="#fff" stroke="none"/>
+<path d="M82 92q14-10 30-2M128 90q16-8 30 2" stroke-width="7" fill="none"/>
+<!-- sonrisota -->
+<path d="M108 150h22" stroke-width="5"/>
+<path d="M110 132q10 6 20 0" stroke-width="3" fill="none"/>
+<ellipse cx="80" cy="134" rx="8" ry="5" fill="#E9787E" opacity=".45" stroke="none"/><ellipse cx="160" cy="134" rx="8" ry="5" fill="#E9787E" opacity=".45" stroke="none"/>
+<circle cx="150" cy="168" r="13" fill="#E8AE84"/>
+<circle cx="196" cy="70" r="7" fill="#fff"/><circle cx="210" cy="50" r="10" fill="#fff"/><text x="210" y="56" font-family="Arial" font-size="16" font-weight="700" fill="#13233A" stroke="none" text-anchor="middle">?</text>
+</g>
+</svg>

@@ -1,183 +1,112 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ficha de propiedad | inmobiliaria.pro</title>
-<meta property="og:type" content="website">
-<meta property="og:title" content="Ficha de propiedad | inmobiliaria.pro">
-<meta property="og:description" content="Precio, análisis de zona, mapa y propiedades similares — mira el detalle completo de esta propiedad en Acierta Max, Guadalajara.">
-<meta property="og:image" content="https://inmobiliaria.pro/assets/marca/og-inmobiliaria-pro.jpg">
-<meta property="og:url" content="https://inmobiliaria.pro/ficha.html">
-<meta property="og:site_name" content="inmobiliaria.pro">
-<meta property="og:locale" content="es_MX">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ficha de propiedad | inmobiliaria.pro">
-<meta name="twitter:description" content="Precio, análisis de zona, mapa y propiedades similares — mira el detalle completo de esta propiedad en Acierta Max, Guadalajara.">
-<meta name="twitter:image" content="https://inmobiliaria.pro/assets/marca/og-inmobiliaria-pro.jpg">
-<meta name="description" content="Precio, análisis de zona, mapa y propiedades similares — mira el detalle completo de esta propiedad en Acierta Max, Guadalajara.">
-<link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/marca/favicon-32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="assets/marca/favicon-48.png">
-<link rel="apple-touch-icon" href="assets/marca/apple-touch-icon.png">
-<meta name="theme-color" content="#13233A">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body class="pg">
-
-<div class="pg-header">
-  <a href="index.html" class="back" aria-label="inmobiliaria.pro, inicio">← <img src="assets/marca/logo-oscuro.png" alt="inmobiliaria.pro" width="134" height="26"></a>
-  <span class="pg-titulo">Ficha de propiedad</span>
-  <a href="mapa.html" class="pg-link">Buscar por zona</a>
-</div>
-
-<main class="ficha" id="ficha">
-  <p class="pg-cargando">Cargando propiedad…</p>
-</main>
-
-<script src="assets/vendor/leaflet/leaflet.js"></script>
-<script src="js/comun.js"></script>
+<html lang="es-MX"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propiedad en Guadalajara | inmobiliaria.pro</title>
+<meta name="description" content="Fotos, descripción, precio y lo que opinan Sofía y Diego de esta propiedad en la Zona Metropolitana de Guadalajara.">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#13233A"><link rel="icon" type="image/png" href="/assets/marca/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/presupuesto.css"><link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
+<style>
+:root{--navy:#13233A;--ambar:#E07812;--ambar2:#F5A04A;--crema:#FFF1E2;--cielo:#E4ECF6;--papel:#F6F7FB}
+body{background:var(--papel)}
+.site-header{position:relative;z-index:1200}
+.fi{max-width:1080px;margin:0 auto;padding:16px 16px 110px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#1d2433}
+.fi-gal{display:grid;grid-template-columns:2fr 1fr;gap:8px;border-radius:22px;overflow:hidden;position:relative;background:var(--navy)}
+.fi-gal img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}.fi-gal .main{aspect-ratio:4/3}.fi-gal .lado{display:grid;grid-template-rows:1fr 1fr;gap:8px}
+.fi-gal .todas{position:absolute;right:14px;bottom:14px;background:#fff;color:var(--navy);border:0;border-radius:999px;padding:10px 16px;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.fi-top{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;margin-top:18px;align-items:start}
+.fi h1{font-size:clamp(1.4rem,3.6vw,2rem);line-height:1.2;color:var(--navy);margin:0 0 6px;font-weight:800}
+.fi .lugar{color:#5b6575;margin:0 0 10px}.fi .precio{font-size:2rem;font-weight:800;color:var(--ambar);margin:4px 0}
+.fi .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.fi .chips span{background:#fff;border:1.5px solid #E3E7EF;border-radius:999px;padding:6px 12px;font-weight:600;font-size:.9rem}
+.fi-caja{background:#fff;border-radius:20px;padding:16px 18px;box-shadow:0 3px 14px rgba(19,35,58,.07);margin-top:16px}
+.fi-caja h2{font-size:1.15rem;color:var(--navy);margin:0 0 10px}
+.fi-desc{white-space:pre-line;line-height:1.65}.fi-desc.corta{max-height:12em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 65%,transparent)}
+.fi-mas{background:none;border:0;color:var(--ambar);font:inherit;font-weight:800;cursor:pointer;padding:6px 0}
+.charla{display:flex;gap:12px;align-items:flex-end;margin:14px 0}.charla figure{margin:0;flex:none;text-align:center}.charla figure img{width:96px;height:auto;display:block}
+.charla figcaption{font-size:.75rem;font-weight:800;background:var(--ambar2);color:var(--navy);border-radius:999px;padding:2px 10px;display:inline-block;margin-top:-6px}
+.charla .b{background:#fff;border-radius:6px 20px 20px 20px;padding:13px 15px;line-height:1.55;box-shadow:0 2px 10px rgba(19,35,58,.08)}.charla.diego{flex-direction:row-reverse}.charla.diego .b{background:var(--cielo);border-radius:20px 6px 20px 20px}
+.charla p{margin:5px 0}.charla .tip{background:var(--crema);border-left:4px solid var(--ambar);border-radius:10px;padding:8px 10px;margin-top:8px}
+#fiMapa{height:260px;border-radius:16px;overflow:hidden}#fiMapa .leaflet-tile-pane{filter:sepia(.5) saturate(1.45) hue-rotate(-14deg) brightness(1.03) contrast(.95)}
+.pin-casa{background:var(--ambar);color:#fff;border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);width:34px;height:34px;box-shadow:0 3px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center}.pin-casa span{transform:rotate(45deg);font-size:16px}
+.fi-sim{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.fi-sim a{background:#fff;border-radius:16px;overflow:hidden;text-decoration:none;color:#1d2433;box-shadow:0 2px 8px rgba(19,35,58,.08)}.fi-sim img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--navy)}
+.fi-sim div{padding:8px 10px;font-size:.86rem}.fi-sim b{display:block;color:var(--ambar);font-size:1rem}
+.fi-barra{position:fixed;left:0;right:0;bottom:0;background:#fff;box-shadow:0 -4px 18px rgba(19,35,58,.12);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;justify-content:center;z-index:50}
+.fi-barra a{flex:1;max-width:340px;text-align:center;border-radius:999px;padding:13px;font-weight:800;text-decoration:none}
+.fi-barra .quiero{background:var(--ambar);color:#fff}.fi-barra .wa{background:var(--navy);color:#fff}
+.visor{position:fixed;inset:0;z-index:9999;background:rgba(5,12,26,.96);display:flex;align-items:center;justify-content:center}.visor img{max-width:94vw;max-height:84vh;object-fit:contain;border-radius:6px}
+.visor button{position:absolute;background:rgba(255,255,255,.14);color:#fff;border:0;cursor:pointer;border-radius:999px;width:54px;height:54px;font-size:32px}
+.visor .x{top:16px;right:16px}.visor .a{left:12px;top:50%;transform:translateY(-50%)}.visor .s{right:12px;top:50%;transform:translateY(-50%)}.visor .n{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#cfd8e6}
+.fi-cargando{padding:60px 0;text-align:center;color:#5b6575}
+@media(max-width:820px){.fi-gal{grid-template-columns:1fr}.fi-gal .lado{display:none}.fi-top{grid-template-columns:1fr}.charla figure img{width:72px}}
+</style></head>
+<body><header class="site-header"><div class="header-inner">
+<a href="/"><img src="/assets/marca/logo-oscuro.png" alt="inmobiliaria.pro" style="height:34px;width:auto"></a>
+<nav class="header-nav"><a href="/presupuesto/">¿Cuánto tienes?</a><a href="/te-acompanamos.html">Platica con Sofía y Diego</a></nav>
+<a class="header-cta" href="/presupuesto/">Seguir buscando</a></div></header>
+<main class="fi" id="fi"><div class="fi-cargando">Sofía está buscando la ficha…</div></main>
+<div class="fi-barra" id="barra" hidden></div>
+<script src="/assets/vendor/leaflet/leaflet.js"></script>
 <script>
-(function () {
-  const $ = id => document.getElementById(id);
-  const qs = new URLSearchParams(location.search);
-  const eb = qs.get('eb'), op = qs.get('op');
-  const raiz = $('ficha');
-
-  function noEncontrada(msg) {
-    raiz.innerHTML = `<div class="ficha-card"><h2>No encontramos esa propiedad</h2>
-      <p>${AM.esc(msg)}</p>
-      <p><a class="btn-solid" style="display:inline-block;padding:10px 18px;border-radius:999px;text-decoration:none" href="index.html">Ver todas las propiedades</a></p></div>`;
-  }
-
-  function barraPosicion(an) {
-    const d0 = Math.min(an.p10, an.pm2) * 0.92, d1 = Math.max(an.p90, an.pm2) * 1.08;
-    const pos = v => Math.max(0, Math.min(100, (v - d0) / (d1 - d0) * 100));
-    return `<div class="rango" aria-hidden="true">
-      <div class="rango-zona" style="left:${pos(an.p25)}%;width:${pos(an.p75) - pos(an.p25)}%"></div>
-      <div class="rango-med" style="left:${pos(an.mediana)}%"></div>
-      <div class="rango-yo" style="left:${pos(an.pm2)}%"></div>
-    </div>
-    <div class="rango-leyenda">
-      <span><i class="l-zona"></i> Rango típico (25%–75%): ${AM.money(an.p25)} – ${AM.money(an.p75)}</span>
-      <span><i class="l-med"></i> Mediana: ${AM.money(an.mediana)}</span>
-      <span><i class="l-yo"></i> Esta propiedad: ${AM.money(an.pm2)}</span>
-    </div>`;
-  }
-
-  function analisisHTML(p, an) {
-    const unidad = p.operacion === 'RENTA' ? '/m² al mes' : '/m²';
-    if (!an.disponible) return `<p class="muted">${AM.esc(an.motivo)}</p>`;
-    const menorQue = Math.round(an.percentil * 100);
-    const frase = an.veredicto === 'bajo'
-      ? `Su precio por m² está <b>${Math.round(Math.abs(an.diffPct) * 100)}% por debajo</b> de la mediana`
-      : an.veredicto === 'alto'
-        ? `Su precio por m² está <b>${Math.round(Math.abs(an.diffPct) * 100)}% por encima</b> de la mediana`
-        : `Su precio por m² está <b>en línea</b> con la mediana (${an.diffPct >= 0 ? '+' : '−'}${Math.round(Math.abs(an.diffPct) * 100)}%)`;
-    return `
-      <p class="an-frase">${frase} de ${AM.esc(an.descripcion)} <span class="muted">(${an.n} propiedades comparables)</span>.</p>
-      <div class="an-cifras">
-        <div><b>${AM.money(an.pm2)}</b><span>${unidad} · esta propiedad</span></div>
-        <div><b>${AM.money(an.mediana)}</b><span>${unidad} · mediana de la zona</span></div>
-        <div><b>${menorQue}%</b><span>de las comparables cuestan menos por m²</span></div>
-      </div>
-      ${barraPosicion(an)}
-      ${an.atipico ? '<p class="an-alerta">⚠️ Este precio se aleja mucho de lo normal en la zona. Puede ser un error de captura: confírmalo con un asesor antes de decidir.</p>' : ''}
-      <p class="muted an-aviso">${AM.esc(AM.AVISO_ANALISIS)}</p>`;
-  }
-
-  function pintar(p, todas) {
-    document.title = p.titulo + ' — inmobiliaria.pro';
-    const an = AM.analisis(p, todas);
-    const url = AM.fichaUrl(p);
-    const wa = encodeURIComponent('Hola, me interesa esta propiedad: ' + p.titulo + ' (' + p.eb + ', ' + (p.operacion === 'RENTA' ? 'renta' : 'venta') + ') — ' + location.origin + '/' + url);
-    const lugar = (p.colonia ? p.colonia + ', ' : '') + p.municipio;
-    const pm2 = AM.precioM2(p);
-    const chips = [];
-    if (p.recamaras) chips.push(p.recamaras + ' recámaras');
-    if (p.banos) chips.push(p.banos + ' baños');
-    if (p.m2) chips.push(Math.round(p.m2).toLocaleString('es-MX') + ' m²');
-    if (pm2) chips.push(AM.money(pm2) + (p.operacion === 'RENTA' ? '/m² al mes' : '/m²'));
-    if (p.niveles) chips.push(p.niveles + (p.niveles === 1 ? ' planta' : ' plantas'));
-    chips.push('Código ' + p.eb);
-    const sim = p.operacion === 'VENTA'
-      ? '' : '';
-    const g = AM.grupoDe(p.tipo);
-    const procUrl = 'proceso.html?modo=' + (p.operacion === 'RENTA' ? 'renta' : 'compra') + '&' + (p.operacion === 'RENTA' ? 'renta' : 'precio') + '=' + Math.round(p.precio) +
-      '&mun=' + encodeURIComponent(p.municipio) + (g !== 'otro' ? '&tipo=' + g : '') + (p.recamaras ? '&rec=' + p.recamaras : '') + (p.m2 ? '&m2=' + Math.round(p.m2) : '');
-    const otra = todas.find(x => x.eb === p.eb && x !== p && x.operacion !== p.operacion);
-    const otraHTML = otra ? `<p class="ficha-otra">También está disponible en <b>${otra.operacion === 'RENTA' ? 'renta' : 'venta'}</b>
-      (${AM.money(otra.precio)}${otra.operacion === 'RENTA' ? '/mes' : ''}) — <a href="${AM.fichaUrl(otra)}">ver esa ficha</a></p>` : '';
-    const similares = AM.similares(p, todas, 4);
-
-    raiz.innerHTML = `
-    <div class="ficha-top">
-      <div class="ficha-foto" ${p.foto ? 'style="background:#0f1f3d"' : ''}>
-        ${AM.iconHouse()}${p.foto ? AM.fotoImg(p.foto, 1200, 800, p.titulo) : ''}
-        <span class="card-op">${AM.esc(p.operacion)}</span>
-        ${p.foto ? '' : '<span class="ficha-sinfoto">Foto próximamente</span>'}
-      </div>
-      <div class="ficha-info">
-        <div class="ficha-eyebrow">${p.operacion === 'RENTA' ? 'Renta' : 'Venta'} · ${AM.esc(p.tipo)} · ${AM.esc(lugar)}</div>
-        <h1>${AM.esc(p.titulo)}</h1>
-        <div class="ficha-precio">${AM.precioTxt(p)} <span>${AM.esMXN(p) ? 'MXN' : 'USD'}${p.operacion === 'RENTA' ? '/mes' : ''}</span></div>
-        ${p.pm2_pub && p.m2 ? `<div class="ficha-pm2">Publicado a ${AM.money(p.pm2_pub)} ${AM.esMXN(p) ? 'MXN' : 'USD'} por m²${p.operacion === 'RENTA' ? ' al mes' : ''} · precio total calculado con ${Math.round(p.m2).toLocaleString('es-MX')} m²</div>` : ''}
-        <div class="chips">${chips.map(c => `<span>${AM.esc(c)}</span>`).join('')}</div>
-        ${otraHTML}
-        <div class="ficha-cta">
-          <a class="btn-solid btn-lg" id="btnHablarAsesor" href="https://wa.me/523333777337?text=${wa}" target="_blank" rel="noopener" data-wa-base="${wa}">Hablar con un asesor por WhatsApp</a>
-          <button class="btn-cmp btn-lg" type="button" data-eb="${AM.esc(AM.clave(p))}" aria-pressed="false">＋ Comparar</button>
-          ${sim}
-        </div>
-        ${AM.compartirHTML(p.titulo, location.origin + '/' + url)}
-      </div>
-    </div>
-
-    <section class="ficha-card" id="secAnalisis">
-      <h2>¿Está bien de precio?</h2>
-      ${analisisHTML(p, an)}
-    </section>
-
-    ${p.lat && p.lon ? `<section class="ficha-card"><h2>Ubicación</h2><div id="miniMapa"></div>
-      <p class="muted">La ubicación en el mapa es aproximada.</p></section>` : ''}
-
-    ${similares.length ? `<section class="ficha-card"><h2>Propiedades similares</h2>
-      <div class="similares">${similares.map(s => AM.cardHTML(s)).join('')}</div></section>` : ''}
-
-    ${AM.confianzaHTML()}
-
-    ${/aciertamax\.com/.test(p.liga || '') ? `<p class="ficha-original">¿Quieres ver la publicación original con más fotos y descripción?
-      <a href="${AM.esc(p.liga)}" target="_blank" rel="noopener">Abrir en aciertamax.com ↗</a></p>` : ''}`;
-
-    // "Hablar con un asesor": la primera vez pide nombre y WhatsApp para asignar un asesor real
-    document.getElementById('btnHablarAsesor').addEventListener('click', function (e) {
-      if (AM.leadGuardado()) return;   // ya tiene lead: deja pasar directo al WhatsApp
-      e.preventDefault();
-      const base = this.dataset.waBase, href = this.href;
-      AM.asegurarLead({ motivo: 'Para que un asesor de Acierta Max te dé seguimiento sobre esta propiedad.',
-        operacion: p.operacion === 'RENTA' ? 'renta' : 'compra', municipio: p.municipio, notas: p.colonia })
-        .then(lead => { window.open(lead && lead.vendedor ? href.replace(base, base + encodeURIComponent(' (folio ' + lead.folio + ')')) : href, '_blank', 'noopener'); });
-    });
-
-    if (p.lat && p.lon && window.L) {
-      try {   // si el mapa falla, la ficha se queda funcionando sin él
-        const m = L.map('miniMapa', { scrollWheelZoom: false, preferCanvas: true }).setView([p.lat, p.lon], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(m);
-        L.circleMarker([p.lat, p.lon], { radius: 10, color: '#d62828', fillOpacity: 0.85 }).addTo(m);
-      } catch (e) { console.error('mapa ficha:', e); const el = document.getElementById('miniMapa'); if (el) el.outerHTML = '<p class="muted">No se pudo mostrar el mapa.</p>'; }
-    }
-    AM.actualizarUI();
-  }
-
-  if (!eb) { noEncontrada('Falta el código de la propiedad en la dirección.'); return; }
-  fetch('data.json').then(r => r.json()).then(todas => {
-    const p = todas.find(x => x.eb === eb && (!op || x.operacion === op)) || todas.find(x => x.eb === eb);
-    if (!p) { noEncontrada('El código ' + eb + ' ya no está en nuestro inventario. Puede haberse rentado o vendido.'); return; }
-    pintar(p, todas);
-  }).catch(e => { console.error('ficha:', e); noEncontrada('No se pudo mostrar la propiedad. Recarga la página; si sigue igual, avísanos por WhatsApp.'); });
+(function(){
+'use strict';
+const AV={S:'/assets/avatares/sofia.svg',SC:'/assets/avatares/sofia-celebra.svg',SS:'/assets/avatares/sofia-senala.svg',D:'/assets/avatares/diego.svg',DL:'/assets/avatares/diego-lupa.svg',DP:'/assets/avatares/diego-pensando.svg'};
+const ZONA={'Zapopan':'Zapopan es el municipio con más oferta. Por Valle Real, Puerta de Hierro y Andares está lo más caro; hacia Tesistán y la orilla norte, lo más accesible.',
+ 'Guadalajara':'En Guadalajara estás cerca de todo: Providencia, Chapultepec y la Americana concentran servicios; el Centro y las colonias tradicionales tienen opciones más accesibles.',
+ 'Tlaquepaque':'Tlaquepaque está a un paso de Guadalajara, con el encanto de su Centro y buena relación entre precio y ubicación.',
+ 'Tonalá':'Tonalá tiene de los precios más accesibles de la zona metropolitana; revisa bien servicios y vialidades de la colonia.',
+ 'Tlajomulco de Zúñiga':'En Tlajomulco hay fraccionamientos nuevos con buen precio por m². Calcula tus traslados en hora pico por López Mateos o la carretera a Chapala.'};
+const q=new URLSearchParams(location.search), clave=(q.get('eb')||'').toUpperCase(), op=(q.get('op')||'VENTA').toUpperCase().startsWith('R')?'R':'V';
+const $=id=>document.getElementById(id), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const din=v=>'$'+Math.round(v||0).toLocaleString('es-MX');
+const sup=p=>p.g==='t'?p.t:(p.s||0), pm2=p=>sup(p)>0?p.p/sup(p):null, mediana=a=>{a=a.filter(Boolean).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:null};
+function visor(fotos,i){const v=document.createElement('div');v.className='visor';v.innerHTML='<button class="x" aria-label="Cerrar">×</button><button class="a" aria-label="Anterior">‹</button><img alt=""><button class="s" aria-label="Siguiente">›</button><div class="n"></div>';
+ document.body.appendChild(v);document.body.style.overflow='hidden';const img=v.querySelector('img');const ver=k=>{i=(k+fotos.length)%fotos.length;img.src=fotos[i];v.querySelector('.n').textContent=(i+1)+' de '+fotos.length;};
+ const cerrar=()=>{v.remove();document.body.style.overflow='';document.removeEventListener('keydown',t);};const t=e=>{if(e.key==='Escape')cerrar();if(e.key==='ArrowRight')ver(i+1);if(e.key==='ArrowLeft')ver(i-1);};
+ v.querySelector('.x').onclick=cerrar;v.querySelector('.a').onclick=()=>ver(i-1);v.querySelector('.s').onclick=()=>ver(i+1);v.onclick=e=>{if(e.target===v)cerrar();};document.addEventListener('keydown',t);
+ let x0=null;v.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});v.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)ver(i+(dx<0?1:-1));x0=null;});ver(i);}
+function charla(quien,pose,html,diego){return `<div class="charla${diego?' diego':''}"><figure><img src="${AV[pose]}" alt="${quien}" width="96" height="104"><figcaption>${quien}</figcaption></figure><div class="b">${html}</div></div>`;}
+Promise.all([fetch('/presupuesto/buscador.json').then(r=>r.json()).catch(()=>[]),
+ fetch('https://acierta.pro/herramientas/neojaus/fichas/'+clave.slice(-2).toLowerCase().replace(/[^a-z0-9]/g,'0')+'.json').then(r=>r.ok?r.json():{}).catch(()=>({}))]).then(async([D,det])=>{
+ let p=D.find(x=>x.e===clave&&x.o===op)||D.find(x=>x.e===clave);
+ if(!p){try{const full=await fetch('/data.json').then(r=>r.json());const f=full.find(x=>x.eb===clave&&x.operacion[0]===op)||full.find(x=>x.eb===clave);
+  if(f)p={e:f.eb,o:f.operacion[0],g:({casa:'c',departamento:'d',terreno:'t'})[f.tipo]||'x',m:f.municipio,c:f.colonia||'',p:f.precio,r:f.recamaras||0,s:Math.round(f.construccion||f.m2||0),t:Math.round(f.terreno||0),f:f.foto,a:f.lat,n:f.lon,x:(f.titulo||'').split(' | ')[0],tipo:f.tipo};}catch(e){}}
+ if(!p){$('fi').innerHTML=charla('Diego','DP','Mmm… esta propiedad ya no aparece en el inventario; probablemente ya se vendió o se rentó. <a href="/presupuesto/" style="color:#E07812;font-weight:800">Te enseño otras parecidas</a>.',true);return;}
+ const d=det[clave]||{};const fotos=(d.uid&&(d.fotos||[]).length)?d.fotos.map(n=>'https://cdn.neojaus.com/properties/'+d.uid+'/'+n):(p.f?[p.f]:[]);
+ const tipoTxt=p.tipo||({c:'Casa',d:'Departamento',t:'Terreno'})[p.g]||'Propiedad', renta=p.o==='R';
+ document.title=`${p.x} · ${din(p.p)}${renta?'/mes':''} | inmobiliaria.pro`;
+ const comps=D.filter(x=>x.m===p.m&&x.g===p.g&&x.o===p.o).map(pm2);const ref=mediana(comps);const v=pm2(p);const dif=v&&ref?(v/ref-1)*100:null;
+ const bueno=[],ojo=[];if(dif!==null){if(dif>-45&&dif<=-12)bueno.push(`por m² sale ${Math.abs(dif).toFixed(0)}% más barata que el promedio de ${esc(p.m)}`);else if(dif<=-45)ojo.push('su precio por m² está demasiado abajo de la zona: confirma la superficie real y el estado');else if(dif>=12)ojo.push(`su m² va ${dif.toFixed(0)}% arriba del promedio de ${esc(p.m)}: pregunta qué lo justifica y negocia`);else bueno.push(`su precio por m² es justo para ${esc(p.m)}`);}
+ if(p.g!=='t'){if(p.r>=3)bueno.push(`tiene ${p.r} recámaras`);if(p.t&&p.s&&p.t>p.s*1.4)bueno.push(`trae ${p.t} m² de terreno, con espacio para crecer`);if(p.r&&p.s&&p.s/p.r<22)ojo.push(`los espacios son compactos: unos ${Math.round(p.s/p.r)} m² por recámara`);}
+ if(d.amenidades&&d.amenidades.length)bueno.push('tiene amenidades');
+ const para=p.g==='t'?'quien quiere construir a su gusto o invertir a largo plazo':p.r>=3?'una familia que necesita espacio':p.r===2&&p.g==='d'?'una pareja o tu primer depa':p.r===1?'vivir solo o invertir para rentar':'quien busca su primer lugar';
+ let tip;if(renta)tip=`Para rentarla suelen pedir ingresos de unas 3 veces la renta (alrededor de ${din(p.p*3)} al mes) y depósito de 1 a 2 meses.`;
+ else if(p.g==='t')tip='Antes de apartar, pide el uso de suelo y confirma que agua, luz y drenaje lleguen hasta el lote.';
+ else{const r=.1013/12,m=p.p*.8*r/(1-Math.pow(1+r,-240));tip=`Con 20% de enganche (${din(p.p*.2)}), la mensualidad rondaría <b>${din(m)}</b> a 20 años; te pedirían ingresos de unos ${din(m/.3)} al mes.`;}
+ const poseS=bueno.length&&!ojo.length?'SC':'SS';
+ const chips=[p.r?p.r+' recámaras':'',d.medios_banos?d.medios_banos+' medios baños':'',p.s?p.s+' m² construidos':'',p.t?p.t+' m² de terreno':'',d.estacionamientos?d.estacionamientos+' estacionamientos':'',d.anio?'Construida en '+d.anio:'',d.mantenimiento?'Mantenimiento '+din(d.mantenimiento)+'/mes':'',d.piso?'Piso '+d.piso:''].filter(Boolean);
+ const amen=(d.amenidades||[]).map(a=>String(a).replace(/_/g,' ')).map(a=>a.charAt(0).toUpperCase()+a.slice(1));
+ const similares=D.filter(x=>x.e!==p.e&&x.m===p.m&&x.g===p.g&&x.o===p.o&&x.p>=p.p*.75&&x.p<=p.p*1.25).sort((a,b)=>Math.abs(a.p-p.p)-Math.abs(b.p-p.p)).slice(0,4);
+ const urlF=x=>`/ficha.html?eb=${encodeURIComponent(x.e)}&op=${x.o==='V'?'VENTA':'RENTA'}`;
+ $('fi').innerHTML=`<nav class="pr-migas"><a href="/">Inicio</a> › <a href="/presupuesto/">¿Cuánto tienes?</a> › ${esc(p.m)}</nav>
+  <div class="fi-gal">${fotos.length?`<img class="main" src="${esc(fotos[0])}" alt="${esc(p.x)}" data-i="0">`:'<div class="main"></div>'}${fotos.length>2?`<div class="lado"><img src="${esc(fotos[1])}" alt="" data-i="1" loading="lazy"><img src="${esc(fotos[2])}" alt="" data-i="2" loading="lazy"></div>`:''}${fotos.length>1?`<button class="todas" id="todas">📷 Ver las ${fotos.length} fotos</button>`:''}</div>
+  <div class="fi-top"><div>
+   <h1>${esc(p.x)}</h1><p class="lugar">📍 ${esc([p.c,p.m].filter(Boolean).join(', '))} · ${esc(tipoTxt)} en ${renta?'renta':'venta'} · Código ${esc(p.e)}</p>
+   <div class="precio">${din(p.p)}${renta?' al mes':''}</div><div class="chips">${chips.map(c=>`<span>${esc(c)}</span>`).join('')}</div>
+   ${charla('Sofía',poseS,`<p><b>Te la explico:</b></p>${bueno.length?`<p>👍 Lo bueno: ${bueno.join('; ')}.</p>`:''}<p>🎯 Es ideal para ${para}.</p><div class="tip">💡 ${tip}</div>`)}
+   ${charla('Diego',ojo.length?'DL':'D',`${ojo.length?`<p>⚠️ <b>Ojo:</b> ${ojo.join('; ')}.</p>`:''}<p>${esc(ZONA[p.m]||'')}</p><p>¿Te late? Toca <b>♥ Quiero verla</b> y te dejo listo con un asesor. Y antes de dar un peso, pide que te la revisemos.</p>`,true)}
+   ${d.descripcion?`<section class="fi-caja"><h2>Lo que dice el anuncio</h2><div class="fi-desc${d.descripcion.length>600?' corta':''}" id="desc">${esc(d.descripcion)}</div>${d.descripcion.length>600?'<button class="fi-mas" id="mas">Leer todo</button>':''}</section>`:''}
+   ${amen.length?`<section class="fi-caja"><h2>Amenidades</h2><div class="chips">${amen.map(a=>`<span>${esc(a)}</span>`).join('')}</div></section>`:''}
+  </div><div>
+   ${p.a?`<section class="fi-caja" style="margin-top:0"><h2>Dónde está</h2><div id="fiMapa"></div><p style="color:#5b6575;font-size:.85rem;margin:8px 0 0">Ubicación aproximada.</p></section>`:''}
+   ${similares.length?`<section class="fi-caja"><h2>Parecidas en ${esc(p.m)}</h2><div class="fi-sim">${similares.map(x=>`<a href="${urlF(x)}"><img src="${esc(x.f||'')}" alt="" loading="lazy"><div><b>${din(x.p)}${x.o==='R'?'/mes':''}</b>${esc(x.x)}</div></a>`).join('')}</div></section>`:''}
+  </div></div>`;
+ $('fi').querySelectorAll('.fi-gal img').forEach(im=>im.onclick=()=>visor(fotos,+im.dataset.i));const t=$('todas');if(t)t.onclick=()=>visor(fotos,0);
+ const mas=$('mas');if(mas)mas.onclick=()=>{$('desc').classList.remove('corta');mas.remove();};
+ if(p.a){const LF=window.L;const mp=LF.map('fiMapa',{scrollWheelZoom:false}).setView([p.a,p.n],15);LF.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(mp);
+  LF.marker([p.a,p.n],{icon:LF.divIcon({className:'',html:'<div class="pin-casa"><span>🏠</span></div>',iconSize:[34,34],iconAnchor:[17,34]})}).addTo(mp);}
+ const b=$('barra');b.hidden=false;b.innerHTML=`<a class="quiero" href="/te-acompanamos.html?fav=${encodeURIComponent(p.e)}&op=${renta?'renta':'compra'}">♥ Quiero verla</a><a class="wa" href="https://wa.me/523333777337?text=${encodeURIComponent('Hola, me interesa esta propiedad de inmobiliaria.pro: '+p.x+' ('+p.e+') '+location.href)}" target="_blank" rel="noopener">WhatsApp</a>`;
+});
 })();
 </script>
-</body>
-</html>
+</body></html>

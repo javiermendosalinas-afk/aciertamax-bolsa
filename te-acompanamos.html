@@ -60,6 +60,7 @@ const TASA=.1013, MESES=240, GASTOS=.06;
 const $=id=>document.getElementById(id), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const din=v=>'$'+Math.round(v||0).toLocaleString('es-MX'), num=v=>parseFloat(String(v||'').replace(/[^\d.]/g,''))||0;
 let S=JSON.parse(localStorage.getItem('ipro_acomp')||'null')||{favoritas:[],imprescindibles:[]};
+const URLQ=new URLSearchParams(location.search),FAV=(URLQ.get('fav')||'').toUpperCase().replace(/[^A-Z0-9-]/g,''),PREOP=['compra','renta'].includes(URLQ.get('op'))?URLQ.get('op'):'';
 let CFG={endpoint:'https://aciertamax-webhook.onrender.com/api/camino',avisoVersion:''}, DATA=null, paso=0, sondeo=null;
 const guardar=()=>{try{localStorage.setItem('ipro_acomp',JSON.stringify(S))}catch(e){}};
 fetch('/camino-datos.json').then(r=>r.json()).then(j=>{CFG=Object.assign(CFG,j)}).catch(()=>{});
@@ -97,9 +98,10 @@ function precalificar(){const ing=num(S.ingresos),eng=num(S.enganche),r=TASA/12;
 
 // ---------- el recorrido ----------
 const PASOS=[
- ()=>{progreso(3,'Nos conocemos');decir('Sofía','¡Qué onda! Soy <strong>Sofía</strong> y él es Diego. Te vamos a ayudar a encontrar tu lugar y a dejarte listo con un asesor de verdad, sin vueltas. Son unas preguntas rápidas. ¿Cómo te llamas?','S');
+ ()=>{progreso(3,'Nos conocemos');if(FAV&&!S.favoritas.includes(FAV)){S.favoritas.push(FAV);guardar();}if(PREOP)S.operacion=PREOP;
+  if(FAV)decir('Sofía','¡Qué onda! Soy <strong>Sofía</strong> y él es Diego. Vi que te gustó una propiedad: ya la apunté en tus favoritas ♥. Con unas preguntas rápidas te dejamos listo con un asesor para que la veas, y de paso te enseñamos otras que te pueden gustar. ¿Cómo te llamas?','SC');else decir('Sofía','¡Qué onda! Soy <strong>Sofía</strong> y él es Diego. Te vamos a ayudar a encontrar tu lugar y a dejarte listo con un asesor de verdad, sin vueltas. Son unas preguntas rápidas. ¿Cómo te llamas?','S');
   campo('text','Tu nombre',v=>{if(v.length<2)return'Escribe tu nombre para seguir.';S.nombre=v;yo(v);sig();},{valor:S.nombre||''});},
- ()=>{progreso(8,'Qué buscas');decir('Diego',`¡Mucho gusto, ${esc(S.nombre.split(' ')[0])}! Para empezar: ¿quieres <strong>comprar</strong> o <strong>rentar</strong>?`,'D');
+ ()=>{progreso(8,'Qué buscas');if(PREOP){decir('Diego',`¡Mucho gusto, ${esc(S.nombre.split(' ')[0])}! Vamos a afinar lo que buscas.`,'D');return sig(true);}decir('Diego',`¡Mucho gusto, ${esc(S.nombre.split(' ')[0])}! Para empezar: ¿quieres <strong>comprar</strong> o <strong>rentar</strong>?`,'D');
   opciones([['compra','🔑 Comprar'],['renta','📝 Rentar']],v=>{S.operacion=v;sig();});},
  ()=>{progreso(13,'Qué buscas');decir('Sofía','¿Qué tipo de lugar tienes en mente?','S');
   opciones([['casa','🏡 Casa'],['departamento','🏢 Depa'],['terreno','🌳 Terreno']],v=>{S.tipo=v;sig();});},

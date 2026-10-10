@@ -16,179 +16,13 @@
 <meta name="twitter:description" content="Miles de casas, departamentos, terrenos y locales en venta y renta en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco, del inventario compartido entre inmobiliarias profesionales. Te acompaña Acierta Max.">
 <meta name="twitter:image" content="https://inmobiliaria.pro/assets/marca/og-inmobiliaria-pro.jpg">
 <meta name="description" content="Miles de casas, departamentos, terrenos y locales en venta y renta en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco, del inventario compartido entre inmobiliarias profesionales. Te acompaña Acierta Max.">
-<link rel="stylesheet" href="styles.css">
+<link rel="canonical" href="https://inmobiliaria.pro/">
+<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="presupuesto.css">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/marca/favicon-32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="assets/marca/favicon-48.png">
 <link rel="apple-touch-icon" href="assets/marca/apple-touch-icon.png">
 <meta name="theme-color" content="#13233A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body>
-
-<header class="site-header">
-  <div class="header-inner">
-    <a class="logo" href="index.html" aria-label="inmobiliaria.pro, inicio"><img src="assets/marca/logo-oscuro.png" alt="inmobiliaria.pro" width="237" height="46"></a>
-    <nav class="header-nav">
-      <a href="presupuesto/">¿Cuánto tienes? 💰</a>
-      <a href="mapa.html">Buscar por zona 🗺️</a>
-      <a href="te-acompanamos.html">Platica con Sofía y Diego 👋</a>
-      <a href="#" id="navVenderRentar">Vender o rentar mi propiedad 📣</a>
-    </nav>
-    <a class="header-cta" href="https://wa.me/523333777337?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener">Habla con un asesor →</a>
-  </div>
-</header>
-
-<section class="hero">
-  <div class="hero-inner">
-    <div class="hero-eyebrow">Solo inmobiliarios profesionales · Zona Metropolitana de Guadalajara</div>
-    <h1>No solo encuentres una propiedad. <em>Encuentra certeza.</em></h1>
-    <p>Miles de opciones en venta y renta de las inmobiliarias que comparten su inventario en Guadalajara, con el acompañamiento de asesores profesionales en cada paso: crédito, notario y documentación. Y Sofía y Diego te explican cada una como amigos.</p>
-
-    <div class="toggles-fila">
-      <div class="op-toggle" id="segToggle" role="group" aria-label="Tipo de inmueble">
-        <button data-seg="vivienda" class="active">🏠 Vivienda</button>
-        <button data-seg="comercial">🏢 Comercial</button>
-      </div>
-      <div class="op-toggle" id="opToggle" role="group" aria-label="Venta o renta">
-        <button data-op="" class="active">Todas</button>
-        <button data-op="VENTA">Venta</button>
-        <button data-op="RENTA">Renta</button>
-      </div>
-    </div>
-
-    <div class="search-panel">
-      <div class="field field-wide">
-        <label for="fTexto">Colonia o palabra clave</label>
-        <input type="text" id="fTexto" list="listaColonias" placeholder="Ej. Providencia, Valle Real, Coto...">
-        <datalist id="listaColonias"></datalist>
-      </div>
-      <div class="field">
-        <label for="fMunicipio">Municipio</label>
-        <select id="fMunicipio">
-          <option value="">Toda la ZMG</option>
-          <option value="Guadalajara">Guadalajara</option>
-          <option value="Zapopan">Zapopan</option>
-          <option value="Tlaquepaque">Tlaquepaque</option>
-          <option value="Tonalá">Tonalá</option>
-          <option value="Tlajomulco de Zúñiga">Tlajomulco</option>
-          <option value="El Salto">El Salto (comercial)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="fTipo">Tipo</label>
-        <select id="fTipo">
-          <option value="">Cualquiera</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="fPrecioMax">Precio máximo</label>
-        <select id="fPrecioMax">
-          <option value="">Sin límite</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="fRecamaras">Recámaras</label>
-        <select id="fRecamaras">
-          <option value="">Cualquiera</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5+</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="fBanos">Baños mín.</label>
-        <select id="fBanos">
-          <option value="">Cualquiera</option>
-          <option value="1">1+</option>
-          <option value="2">2+</option>
-          <option value="3">3+</option>
-          <option value="4">4+</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="fM2Min">m² mínimo</label>
-        <input type="number" id="fM2Min" placeholder="Ej. 100">
-      </div>
-      <div class="field">
-        <label for="fM2Max">m² máximo</label>
-        <input type="number" id="fM2Max" placeholder="Ej. 300">
-      </div>
-      <div class="field">
-        <label for="fNiveles">Niveles</label>
-        <select id="fNiveles">
-          <option value="">Cualquiera</option>
-          <option value="1">1 planta</option>
-          <option value="2">2 plantas</option>
-          <option value="3">3+ plantas</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="fOrden">Ordenar por</label>
-        <select id="fOrden">
-          <option value="precio_asc">Precio: menor a mayor</option>
-          <option value="precio_desc">Precio: mayor a menor</option>
-          <option value="m2_desc">m²: mayor a menor</option>
-        </select>
-      </div>
-      <button class="search-btn" id="btnBuscar">Buscar</button>
-    </div>
-    <label class="chk-fotos"><input type="checkbox" id="fFotoPrimero" checked> Mostrar primero las propiedades que tienen foto</label>
-  </div>
-</section>
-
-<div class="stats-strip" id="statsStrip"></div>
-
-<section style="max-width:1100px;margin:24px auto 0;padding:0 18px">
-  <link rel="stylesheet" href="presupuesto.css">
-  <div class="pr-sec" style="margin-top:0">
-    <div class="pr-burbuja"><figure><img src="assets/avatares/sofia.svg" alt="Sofía, asesora virtual" width="104" height="113"><figcaption>Sofía</figcaption></figure><div class="txt"><b class="n">SOFÍA DICE</b>¡Qué onda! ¿No sabes por dónde empezar? Dinos cuánto tienes y te enseñamos qué casas, departamentos y terrenos te alcanzan, y en qué colonias rinde más tu dinero.</div></div>
-    <div class="pr-burbuja der"><figure><img src="assets/avatares/diego.svg" alt="Diego, asesor virtual" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Sin rodeos y con datos reales. <a href="presupuesto/" style="color:#E07812;font-weight:800">Busca por presupuesto</a> o <a href="te-acompanamos.html" style="color:#E07812;font-weight:800">platica con nosotros y te dejamos listo con un asesor</a>.</div></div>
-  </div>
-</section>
-
-<section class="results-section">
-  <div class="results-header">
-    <h2>Propiedades disponibles</h2>
-    <div class="results-count" id="resultsCount"></div>
-  </div>
-  <div id="grid" class="grid">
-    <div class="loader">Cargando inventario…</div>
-  </div>
-  <button class="load-more" id="loadMore" style="display:none;">Ver más propiedades</button>
-</section>
-
-<section class="coaching">
-  <div class="coaching-inner">
-    <div>
-      <div class="coaching-eyebrow">Lo que nos distingue</div>
-      <h2>No vendemos anuncios.<br>Acompañamos tu proceso completo.</h2>
-      <p>Precalificación de crédito e Infonavit, selección de notario, qué exige PROFECO, cómo recibir tu propiedad — coaching real de principio a fin, con 20 años de experiencia ejecutiva respaldando cada paso.</p>
-      <a class="coaching-cta" href="https://wa.me/523333777337?text=Hola%2C%20quiero%20que%20me%20acompa%C3%B1en%20en%20todo%20el%20proceso" target="_blank" rel="noopener">Empieza tu proceso con MAX</a>
-    </div>
-    <div class="coaching-steps">
-      <div class="coaching-step">
-        <div class="num">01</div>
-        <div><h4>Presupuesto y crédito</h4><p>Sabemos exactamente qué te alcanza antes de que te enamores de algo que no puedes pagar.</p></div>
-      </div>
-      <div class="coaching-step">
-        <div class="num">02</div>
-        <div><h4>Búsqueda guiada</h4><p>No te mandamos una lista genérica — acotamos contigo hasta encontrar lo correcto.</p></div>
-      </div>
-      <div class="coaching-step">
-        <div class="num">03</div>
-        <div><h4>Oferta y documentación</h4><p>Te decimos exactamente qué va a pedir el banco o Infonavit, sin sorpresas.</p></div>
-      </div>
-      <div class="coaching-step">
-        <div class="num">04</div>
-        <div><h4>Cierre con certeza</h4><p>Notario calificado, requisitos de PROFECO y NOM, y cómo recibir tu propiedad correctamente.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -210,24 +44,59 @@
   "memberOf": {"@type": "Organization", "name": "AMPI (Asociación Mexicana de Profesionales Inmobiliarios)"}
 }
 </script>
-<footer class="site-footer">
-  <strong>inmobiliaria.pro</strong> · Solo inmobiliarios profesionales · Zona Metropolitana de Guadalajara<br>
-  Operado por Acierta Max, S.A. de C.V. · 
-  Socio AMPI · Inventario compartido entre inmobiliarias; información y disponibilidad sujetas a confirmación<br>
-  <a href="aviso-privacidad.html" style="color:inherit">Aviso de privacidad</a>
-</footer>
-
-<script src="js/comun.js"></script>
-<script src="app.js"></script>
+<style>
+body{background:#F6F7FB;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+.bv{max-width:860px;margin:0 auto;padding:18px 16px 120px;text-align:center}
+.bv-duo{display:flex;justify-content:center;align-items:flex-end;gap:4px;margin-top:4px}.bv-duo img{width:min(36vw,190px);height:auto}
+.bv h1{color:#13233A;font-size:clamp(1.6rem,5vw,2.4rem);line-height:1.15;margin:6px 0 4px;font-weight:800}
+.bv .sub{color:#5b6575;margin:0 0 14px}
+.bv-hola{display:flex;gap:10px;align-items:flex-start;text-align:left;max-width:620px;margin:0 auto 16px}
+.bv-hola .b{background:#fff;border-radius:6px 20px 20px 20px;padding:13px 16px;line-height:1.55;box-shadow:0 2px 10px rgba(19,35,58,.08)}
+.bv-hola .b b.n{display:block;color:#E07812;font-size:.78rem;margin-bottom:2px}
+.puertas{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:620px;margin:0 auto}
+.puerta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;border:3px solid #E6E9F0;border-radius:22px;padding:18px 10px;text-decoration:none;color:#13233A;font-weight:800;font-size:1.05rem;box-shadow:0 3px 12px rgba(19,35,58,.07);transition:transform .15s,border-color .15s}
+.puerta:hover,.puerta:focus-visible{border-color:#E07812;transform:translateY(-2px);outline:none}.puerta .ico{font-size:2rem}.puerta small{font-weight:600;color:#5b6575;font-size:.82rem}
+.puerta.prim{background:#E07812;border-color:#E07812;color:#fff}.puerta.prim small{color:#FFE7CC}
+.bv-sec{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0 0}
+.bv-sec a,.bv-sec button{border:2px solid #13233A;background:transparent;color:#13233A;border-radius:999px;padding:10px 16px;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+.bv-pasos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:28px auto 0;max-width:760px;text-align:left}
+.bv-pasos div{background:#13233A;color:#fff;border-radius:18px;padding:14px}.bv-pasos b{color:#F5A04A;display:block;margin-bottom:4px}
+.bv-voz{margin:8px auto 14px;border:2px solid #E07812;background:#fff;color:#13233A;border-radius:999px;padding:7px 14px;font:inherit;font-weight:800;cursor:pointer}
+@media(max-width:560px){.bv-pasos{grid-template-columns:1fr}.puerta{font-size:.98rem;padding:16px 8px}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="header-inner">
+<a class="logo" href="/" aria-label="inmobiliaria.pro, inicio"><img src="assets/marca/logo-oscuro.png" alt="inmobiliaria.pro" width="237" height="46" style="height:34px;width:auto"></a>
+<nav class="header-nav"><a href="/presupuesto/">¿Cuánto tienes?</a><a href="/presupuesto/#vista=mapa">Mapa</a><a href="/te-acompanamos.html">Platica con nosotros</a></nav>
+<a class="header-cta" href="https://wa.me/523333777337?text=Hola%2C%20vengo%20de%20inmobiliaria.pro" target="_blank" rel="noopener">WhatsApp</a>
+</div></header>
+<main class="bv">
+<div class="bv-duo"><img src="assets/avatares/sofia.svg" alt="Sofía, anfitriona virtual" width="190" height="206"><img src="assets/avatares/diego.svg" alt="Diego, anfitrión virtual" width="190" height="206"></div>
+<h1>¡Bienvenido a inmobiliaria.pro!</h1>
+<p class="sub">Casas, departamentos y terrenos en Guadalajara, explicados como amigos</p>
+<div class="bv-hola"><div class="b" id="saludo"><b class="n">SOFÍA Y DIEGO</b>¡Qué gusto tenerte aquí! Somos Sofía y Diego, tus anfitriones. Te llevamos de la mano: te decimos qué te alcanza, te enseñamos las mejores opciones y te dejamos listo con un asesor. ¿Qué te trae por aquí?</div></div>
+<button type="button" class="bv-voz" id="btnVoz">🔊 Escúchanos</button>
+<div class="puertas">
+ <a class="puerta prim" href="/te-acompanamos.html?op=compra"><span class="ico">🔑</span>Quiero comprar<small>Te acompañamos paso a paso</small></a>
+ <a class="puerta prim" href="/te-acompanamos.html?op=renta"><span class="ico">📝</span>Quiero rentar<small>Te acompañamos paso a paso</small></a>
+ <a class="puerta" href="/presupuesto/"><span class="ico">💰</span>¿Qué alcanza con mi dinero?<small>Busca por presupuesto</small></a>
+ <a class="puerta" href="/presupuesto/#vista=mapa"><span class="ico">🗺️</span>Ver en el mapa<small>Toca un globito y ve la casa</small></a>
+</div>
+<div class="bv-sec">
+ <a href="https://wa.me/523333777337?text=Hola%2C%20quiero%20vender%20o%20rentar%20mi%20propiedad%20con%20inmobiliaria.pro" target="_blank" rel="noopener">📣 Quiero vender o rentar mi propiedad</a>
+ <a href="/todas.html">Ver todo con filtros</a>
+</div>
+<div class="bv-pasos">
+ <div><b>1 · Te conocemos</b>Qué buscas, para quién y cuánto te alcanza con tu crédito.</div>
+ <div><b>2 · Eliges 3</b>Te enseñamos las que mejor te quedan; tú eliges máximo 3 para visitar.</div>
+ <div><b>3 · Te acompañamos</b>Un asesor profesional te lleva a verlas, revisa la casa y cuida tu dinero.</div>
+</div>
+</main>
+<footer class="site-footer">inmobiliaria.pro · Solo inmobiliarios profesionales · Zona Metropolitana de Guadalajara<br>Operado por Acierta Max, S.A. de C.V. · <a href="/sofia-y-diego.html" style="color:inherit">Conoce a Sofía y Diego</a> · <a href="/aviso-privacidad.html" style="color:inherit">Aviso de privacidad</a></footer>
+<script src="/js/juego.js"></script><script src="/js/voz.js"></script><script src="/js/pregunta.js"></script>
 <script>
-document.getElementById('navVenderRentar').addEventListener('click', function (e) {
-  e.preventDefault();
-  const texto = 'Hola, quiero información para vender o rentar mi propiedad con inmobiliaria.pro.';
-  const lanzar = lead => window.open('https://wa.me/523333777337?text=' + encodeURIComponent(texto) + (lead && lead.vendedor ? encodeURIComponent(` (folio ${lead.folio})`) : ''), '_blank', 'noopener');
-  if (AM.leadGuardado()) { lanzar(AM.leadGuardado()); return; }
-  AM.asegurarLead({ motivo: 'Para que un asesor profesional te contacte sobre tu propiedad.' }).then(lanzar);
-});
+(function(){const b=document.getElementById('btnVoz');if(!window.Voz||!Voz.puedeHablar){b.hidden=true;return;}
+ b.onclick=()=>{Voz.poner(true);b.textContent='🔊 Voz activada';Voz.decir('Sofía','¡Qué gusto tenerte aquí! Soy Sofía.');Voz.decir('Diego','Y yo soy Diego. Somos tus anfitriones: te llevamos de la mano hasta encontrar tu lugar. Elige una opción para empezar.');};})();
 </script>
-<script src="/js/pregunta.js" defer></script>
-</body>
-</html>
+</body></html>

@@ -211,7 +211,7 @@ CSS = """
 .bq-sel .c b.pr{display:block;color:#E07812;font-size:1.2rem}.bq-sel .c .com{background:#FFF6EC;border-radius:10px;padding:6px 8px;margin:6px 0;display:flex;gap:6px;align-items:flex-start}.bq-sel .c .com img{width:30px;min-height:0;height:auto;background:none}
 .bq-sel .acc{display:flex;gap:6px;flex-wrap:wrap}.bq-sel .acc a{background:#13233A;color:#fff;border-radius:999px;padding:8px 12px;font-weight:800;text-decoration:none;font-size:.85rem}.bq-sel .acc a.fav{background:#E07812}
 .bq-sel .cerrar{position:absolute;top:6px;right:6px;border:0;background:#fff;border-radius:99px;width:30px;height:30px;font-size:18px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.bq-pista{position:absolute;top:10px;left:10px;right:60px;z-index:500;background:#fff;border-radius:16px;padding:8px 12px;display:flex;gap:8px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:.88rem;font-weight:600}
+.bq-pista{position:absolute;top:10px;left:54px;right:10px;z-index:500;background:#fff;border-radius:16px;padding:8px 12px;display:flex;gap:8px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:.88rem;font-weight:600}
 .bq-pista img{width:38px;height:auto}
 .pin-precio.on{background:#E07812;color:#fff;transform:scale(1.25)}
 .bq-tabs{display:none;gap:8px;margin:12px 0 0}.bq-tabs button{flex:1;border:2px solid #E6E9F0;background:#fff;border-radius:14px;padding:10px;font:inherit;font-weight:800;color:#13233A;cursor:pointer}.bq-tabs button.on{background:#13233A;color:#fff;border-color:#13233A}
@@ -285,7 +285,8 @@ function elegir(p){window.Juego&&Juego.sfx('pop');$('bqPista').style.display='no
  $('bqSel').innerHTML=`<div class="bq-sel"><button type="button" class="cerrar" aria-label="Cerrar">×</button>${p.f?`<img src="${esc(p.f)}" alt="">`:'<img alt="">'}<div class="c"><b class="pr">${din(p.p)}${p.o==='R'?'/mes':''}</b>${esc(p.x)}<br><span style="color:#5b6575">${esc([p.c||p.m,p.r?p.r+' rec':'',sup(p)?sup(p)+' m²':''].filter(Boolean).join(' · '))}</span>
   <div class="com"><img src="${adv?AV.DL:AV.SS}" alt="">${esc(adv?X.ojo:X.bueno)}.</div><div class="acc"><a href="${u}">Ver ficha completa</a><a class="fav" href="/te-acompanamos.html?fav=${encodeURIComponent(p.e)}&op=${p.o==='V'?'compra':'renta'}">♥ Quiero verla</a></div></div></div>`;
  $('bqSel').querySelector('.cerrar').onclick=()=>{$('bqSel').innerHTML='';document.querySelectorAll('.pin-precio.on').forEach(x=>x.classList.remove('on'));};}
-function tab(v){document.querySelectorAll('.bq-tabs button').forEach(x=>x.classList.toggle('on',x.dataset.tab===v));$('bqRes').className='bq-res ver-'+v;if(v==='mapa'&&mapa)setTimeout(()=>mapa.invalidateSize(),60);}
+let ultPts=[];
+function tab(v){document.querySelectorAll('.bq-tabs button').forEach(x=>x.classList.toggle('on',x.dataset.tab===v));$('bqRes').className='bq-res ver-'+v;if(v==='mapa'&&mapa)setTimeout(()=>{mapa.invalidateSize();if(ultPts.length&&!$('bqSel').innerHTML)mapa.fitBounds(ultPts,{padding:[30,30],maxZoom:14});},80);}
 function rango(){const r=RANGO[est.o+est.g],s=$('bqTope');s.min=r[0];s.max=r[1];s.step=r[2];if(est.tope==null||est.tope<r[0]||est.tope>r[1])est.tope=r[3];s.value=est.tope;
  $('bqTopeTxt').textContent='Hasta '+din(est.tope)+(est.o==='R'?' al mes':'');$('bqRecPaso').style.display=$('bqRec').style.display=est.g==='t'?'none':'';}
 let mostrar=24;
@@ -302,20 +303,22 @@ function pintar(){rango();
  <div class="pr-burbuja der"><figure><img src="${AV.D}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Ojo, ahí te va un tip: ${esc(ZONA[est.m])} Te las puse de las que más rinden a las que menos. ¿Quieres saber cuánto te prestan y que un asesor te acompañe? <a href="/te-acompanamos.html" style="color:#E07812;font-weight:800">Platica con nosotros</a>.</div></div>`;
  $('bqLista').innerHTML=L.slice(0,mostrar).map(tarjeta).join('')+(L.length>mostrar?`<div class="bq-mas"><button class="pr-cta" id="bqMas" style="border:0;cursor:pointer">Ver ${Math.min(24,L.length-mostrar)} más</button></div>`:'');
  const b=$('bqMas');if(b)b.onclick=()=>{mostrar+=24;pintar()};
- capa.clearLayers();marc={};$('bqSel').innerHTML='';const pts=[];L.slice(0,300).forEach((p,i)=>{if(!p.a)return;const mk=i<40?LF.marker([p.a,p.n],{zIndexOffset:i<10?1000:(40-i)*10,icon:LF.divIcon({className:'',html:`<span class="pin-precio${i<10?' top':''}">${corto(p.p)}</span>`,iconSize:null})}):LF.circleMarker([p.a,p.n],{radius:5,color:'#fff',weight:1.5,fillColor:'#E07812',fillOpacity:.85});
+ capa.clearLayers();marc={};$('bqSel').innerHTML='';const pts=[];L.slice(0,300).forEach((p,i)=>{if(!p.a)return;const lim=innerWidth<700?15:40;const mk=i<lim?LF.marker([p.a,p.n],{zIndexOffset:i<10?1000:(40-i)*10,icon:LF.divIcon({className:'',html:`<span class="pin-precio${i<10?' top':''}">${corto(p.p)}</span>`,iconSize:null})}):LF.circleMarker([p.a,p.n],{radius:5,color:'#fff',weight:1.5,fillColor:'#E07812',fillOpacity:.85});
   mk.on('click',()=>elegir(p));mk.addTo(capa);marc[p.e]=mk;pts.push([p.a,p.n]);});
  document.querySelectorAll('.enmapa').forEach(bt=>bt.onclick=()=>{const p=L.find(x=>x.e===bt.dataset.e);if(!p)return;tab('mapa');setTimeout(()=>{mapa.setView([p.a,p.n],15);elegir(p);},120);if(innerWidth>900)$('bqMapa').scrollIntoView({behavior:'smooth',block:'center'});});
- if(pts.length)mapa.fitBounds(pts,{padding:[30,30],maxZoom:14});
- if(tocado&&window.Juego)Juego.logro('Explorador: encontraste opciones','🔎');history.replaceState(null,'','#'+new URLSearchParams({o:est.o,g:est.g,m:est.m,r:est.r,tope:est.tope}));}
+ const q=(arr,f)=>{const s=arr.slice().sort((x,y)=>x-y);return s[Math.min(s.length-1,Math.max(0,Math.floor(f*(s.length-1))))];};
+ const la=pts.map(x=>x[0]),ln=pts.map(x=>x[1]),cerca=pts.length>8?pts.filter(x=>x[0]>=q(la,.08)&&x[0]<=q(la,.92)&&x[1]>=q(ln,.08)&&x[1]<=q(ln,.92)):pts;
+ ultPts=cerca.length?cerca:pts;mapa.invalidateSize();if(ultPts.length)mapa.fitBounds(ultPts,{padding:[30,30],maxZoom:14});
+ if(tocado&&window.Juego)Juego.logro('Explorador: encontraste opciones','🔎');history.replaceState(null,'','#'+new URLSearchParams(Object.assign({o:est.o,g:est.g,m:est.m,r:est.r,tope:est.tope},$('bqRes').classList.contains('ver-mapa')?{vista:'mapa'}:{})));}
 document.querySelectorAll('.bq-ops').forEach(g=>g.addEventListener('click',e=>{tocado=true;const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
  const c=g.dataset.campo;est[c]=c==='r'?+b.dataset.v:b.dataset.v;if(c==='o'||c==='g')est.tope=null;mostrar=24;pintar();}));
 document.querySelectorAll('.bq-tabs button').forEach(x=>x.onclick=()=>tab(x.dataset.tab));
 $('bqTope').addEventListener('input',e=>{tocado=true;est.tope=+e.target.value;mostrar=24;pintar();});
 mapa=LF.map('bqMapa',{scrollWheelZoom:false}).setView([20.67,-103.38],11);
 LF.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(mapa);capa=LF.layerGroup().addTo(mapa);
-const q=new URLSearchParams(location.hash.slice(1));['o','g','m'].forEach(k=>{if(q.has(k))est[k]=q.get(k)});if(q.has('r'))est.r=+q.get('r');if(q.has('tope'))est.tope=+q.get('tope');
+const q=new URLSearchParams(location.hash.slice(1));const verMapa=q.get('vista')==='mapa';['o','g','m'].forEach(k=>{if(q.has(k))est[k]=q.get(k)});if(q.has('r'))est.r=+q.get('r');if(q.has('tope'))est.tope=+q.get('tope');
 document.querySelectorAll('.bq-ops').forEach(g=>{const c=g.dataset.campo;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',String(b.dataset.v)===String(est[c])))});
-fetch('/presupuesto/buscador.json').then(r=>r.json()).then(j=>{D=j;const gr={};D.forEach(p=>{const v=pm2(p);if(v)(gr[p.m+p.g+p.o]=gr[p.m+p.g+p.o]||[]).push(v)});for(const k in gr)ref[k]=med(gr[k]);pintar();});
+fetch('/presupuesto/buscador.json').then(r=>r.json()).then(j=>{D=j;if(verMapa){tab('mapa');setTimeout(()=>{document.getElementById('bqMapa').scrollIntoView({block:'center'});},300);}const gr={};D.forEach(p=>{const v=pm2(p);if(v)(gr[p.m+p.g+p.o]=gr[p.m+p.g+p.o]||[]).push(v)});for(const k in gr)ref[k]=med(gr[k]);pintar();});
 })();
 </script>'''
 
@@ -331,7 +334,7 @@ def cabeza(titulo, desc, canon, img=None, extra=""):
 <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/presupuesto.css">{extra}<script src="/js/pregunta.js" defer></script></head>
 <body style="background:#F6F7FB"><header class="site-header"><div class="header-inner">
 <a href="/"><img src="/assets/marca/logo-oscuro.png" alt="inmobiliaria.pro" style="height:34px;width:auto"></a>
-<nav class="header-nav"><a href="/presupuesto/">¿Cuánto tienes?</a><a href="/mapa.html">Mapa</a><a href="/sofia-y-diego.html">Sofía y Diego</a></nav>
+<nav class="header-nav"><a href="/">Inicio</a><a href="/presupuesto/">¿Cuánto tienes?</a><a href="/presupuesto/#vista=mapa">Mapa</a><a href="/te-acompanamos.html">Platica con nosotros</a></nav>
 <a class="header-cta" href="https://wa.me/{WA}?text=Hola%2C%20vi%20una%20propiedad%20en%20inmobiliaria.pro" target="_blank" rel="noopener">Escríbenos →</a>
 </div></header><main class="pr-wrap">"""
 

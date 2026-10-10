@@ -19,7 +19,7 @@
   fetch('/camino-datos.json').then(r => r.json()).then(j => { if (j.endpoint) endpoint = j.endpoint.replace(/\/api\/camino.*$/, '/api/sofia'); }).catch(() => {});
   try { historial = JSON.parse(sessionStorage.getItem('ipro_preguntas') || '[]'); } catch (e) {}
   const css = document.createElement('style');
-  css.textContent = `.pq-fab{position:fixed;left:14px;bottom:86px;z-index:99980;display:flex;align-items:center;gap:8px;background:#E07812;color:#fff;border:3px solid #fff;border-radius:999px;padding:6px 14px 6px 6px;font:800 14px 'Plus Jakarta Sans',system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer}
+  css.textContent = `.pq-fab{position:fixed;left:14px;bottom:var(--fab-abajo,16px);z-index:99980;display:flex;align-items:center;gap:8px;background:#E07812;color:#fff;border:3px solid #fff;border-radius:999px;padding:6px 14px 6px 6px;font:800 14px 'Plus Jakarta Sans',system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer}
 .pq-fab img{width:38px;height:38px;border-radius:50%;background:#FFF1E2;object-fit:cover;object-position:top}
 .pq{position:fixed;inset:0;z-index:100001;background:rgba(5,12,26,.55);display:flex;align-items:flex-end;justify-content:center}
 .pq .hoja{background:#F6F7FB;width:min(560px,100%);height:min(86vh,720px);border-radius:22px 22px 0 0;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
@@ -87,6 +87,7 @@
     if (window.Juego) Juego.sfx('coin');
   }
   function boton() {
+    if (document.querySelector('.fi-barra')) document.documentElement.style.setProperty('--fab-abajo', '86px');
     const b = document.createElement('button'); b.type = 'button'; b.className = 'pq-fab'; b.setAttribute('aria-label', 'Pregúntale a Sofía y Diego');
     b.innerHTML = '<img src="/assets/avatares/sofia.svg" alt=""><span>Pregúntanos</span>'; b.onclick = () => abrir(); document.body.appendChild(b);
   }

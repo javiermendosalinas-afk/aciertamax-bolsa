@@ -143,7 +143,7 @@
   // ---------- botón de sonido ----------
   function boton() {
     const b = document.createElement('div');
-    b.style.cssText = 'position:fixed;right:14px;bottom:86px;z-index:99990;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font:700 13px "Plus Jakarta Sans",system-ui,sans-serif';
+    b.style.cssText = 'position:fixed;right:14px;bottom:' + (document.querySelector('.fi-barra') ? '86px' : '16px') + ';z-index:99990;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font:700 13px "Plus Jakarta Sans",system-ui,sans-serif';
     b.innerHTML = `<div id="jgMenu" style="background:#fff;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.2);padding:8px;display:none;gap:4px">
       <label style="display:flex;gap:8px;align-items:center;padding:6px 8px;cursor:pointer"><input type="checkbox" id="jgMus"> 🎵 Música</label>
       <label style="display:flex;gap:8px;align-items:center;padding:6px 8px;cursor:pointer"><input type="checkbox" id="jgSfx"> 🔔 Efectos</label>

@@ -75,7 +75,7 @@ body{background:var(--papel);font-family:'Plus Jakarta Sans',system-ui,sans-seri
 </style></head>
 <body><header class="site-header"><div class="header-inner">
 <a href="/"><img src="/assets/marca/logo-oscuro.png" alt="inmobiliaria.pro" style="height:34px;width:auto"></a>
-<nav class="header-nav"><a href="/presupuesto/">¿Cuánto tienes?</a><a href="/sofia-y-diego.html">Sofía y Diego</a></nav>
+<nav class="header-nav"><a href="/">Inicio</a><a href="/presupuesto/">¿Cuánto tienes?</a><a href="/presupuesto/#vista=mapa">Mapa</a></nav>
 <a class="header-cta" href="https://wa.me/523333777337?text=Hola%2C%20vengo%20de%20inmobiliaria.pro" target="_blank" rel="noopener">WhatsApp</a>
 </div></header>
 <main class="ac">
@@ -214,7 +214,8 @@ function contexto(lista){const ref={};(DATA||[]).forEach(x=>{const k=x.m+x.g+x.o
 // ---------- el recorrido ----------
 const PASOS=[
  ()=>{progreso(3,'Nos conocemos');if(FAV&&!S.favoritas.includes(FAV)){S.favoritas.push(FAV);guardar();}if(PREOP)S.operacion=PREOP;
-  if(FAV)decir('Sofía','¡Qué onda! Soy <strong>Sofía</strong> y él es Diego. Vi que te gustó una propiedad: ya la apunté en tus favoritas ♥. Con unas preguntas rápidas te dejamos listo con un asesor para que la veas, y de paso te enseñamos otras que te pueden gustar. ¿Cómo te llamas?','SC');else decir('Sofía','¡Qué onda! Soy <strong>Sofía</strong> y él es Diego. Te vamos a ayudar a encontrar tu lugar y a dejarte listo con un asesor de verdad, sin vueltas. Son unas preguntas rápidas. ¿Cómo te llamas?','S');
+  if(FAV)decir('Sofía','¡Qué onda! Soy <strong>Sofía</strong> y él es Diego. Vi que te gustó una propiedad: ya la apunté en tus favoritas ♥. Con unas preguntas rápidas te dejamos listo con un asesor para que la veas, y de paso te enseñamos otras que te pueden gustar. ¿Cómo te llamas?','SC');else if(PREOP)decir('Sofía',`¡Bienvenido! Soy <strong>Sofía</strong> y él es Diego, tus anfitriones. Qué gusto que quieras ${PREOP==='renta'?'rentar':'comprar'}: te llevamos de la mano hasta dejarte listo con un asesor, sin vueltas. Para empezar, ¿cómo te llamas?`,'SC');
+  else decir('Sofía','¡Qué onda! Soy <strong>Sofía</strong> y él es Diego. Te vamos a ayudar a encontrar tu lugar y a dejarte listo con un asesor de verdad, sin vueltas. Son unas preguntas rápidas. ¿Cómo te llamas?','S');
   campo('text','Tu nombre',v=>{if(v.length<2)return'Escribe tu nombre para seguir.';S.nombre=v;yo(v);sig();},{valor:S.nombre||''});},
  ()=>{progreso(8,'Qué buscas');if(PREOP){decir('Diego',`¡Mucho gusto, ${esc(S.nombre.split(' ')[0])}! Vamos a afinar lo que buscas.`,'D');return sig(true);}decir('Diego',`¡Mucho gusto, ${esc(S.nombre.split(' ')[0])}! Para empezar: ¿quieres <strong>comprar</strong> o <strong>rentar</strong>?`,'D');
   opciones([['compra','🔑 Comprar'],['renta','📝 Rentar']],v=>{S.operacion=v;sig();});},

@@ -140,7 +140,94 @@ CSS = """
 .pr-faq dt{font-weight:700;margin-top:12px;color:#13233A}.pr-faq dd{margin:4px 0 0;line-height:1.55}
 .pr-cta{display:inline-block;background:#E07812;color:#fff;border-radius:999px;padding:12px 20px;font-weight:800;text-decoration:none;margin-top:10px}
 .pr-aviso{font-size:.8rem;color:#5b6575;margin-top:14px}
+.bq{background:#fff;border-radius:22px;padding:18px 20px;box-shadow:0 4px 18px rgba(19,35,58,.08);margin:18px 0}
+.bq-paso{margin:12px 0 4px;font-weight:800;color:#13233A}.bq-paso span{color:#E07812;margin-right:6px}
+.bq-ops{display:flex;flex-wrap:wrap;gap:8px}.bq-ops button{border:2px solid #E6E9F0;background:#fff;border-radius:16px;padding:10px 14px;font:inherit;font-weight:700;color:#13233A;cursor:pointer;display:flex;align-items:center;gap:8px}
+.bq-ops button.on{border-color:#E07812;background:#FFF1E2}.bq-ops button .ico{font-size:1.4rem}
+.bq-rango{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.bq-rango input[type=range]{flex:1;min-width:220px;accent-color:#E07812}.bq-rango b{font-size:1.3rem;color:#E07812;min-width:150px}
+.bq-res{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:14px;align-items:start}
+#bqMapa{height:620px;border-radius:20px;overflow:hidden;position:sticky;top:12px;box-shadow:0 4px 18px rgba(19,35,58,.12)}
+#bqMapa .leaflet-tile-pane{filter:sepia(.5) saturate(1.45) hue-rotate(-14deg) brightness(1.03) contrast(.95)}
+.pin-precio{background:#F5A04A;color:#13233A;font-weight:800;font-size:12px;border-radius:999px;padding:3px 8px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25);white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif}
+.pin-precio.top{background:#13233A;color:#F5A04A}
+.bq-lista{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bq-mas{grid-column:1/-1;text-align:center}
+.bq-vacio{background:#FFF6EC;border-radius:16px;padding:16px;line-height:1.6}
+@media(max-width:900px){.bq-res{grid-template-columns:1fr}#bqMapa{height:380px;position:relative;order:-1}.bq-lista{grid-template-columns:1fr}}
 """
+
+
+BUSCADOR = '''<link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
+<section class="bq" id="buscador">
+<div class="bq-paso"><span>1</span>¿Comprar o rentar?</div><div class="bq-ops" data-campo="o"><button data-v="V" class="on"><span class="ico">🔑</span>Comprar</button><button data-v="R"><span class="ico">📝</span>Rentar</button></div>
+<div class="bq-paso"><span>2</span>¿Qué buscas?</div><div class="bq-ops" data-campo="g"><button data-v="c" class="on"><span class="ico">🏡</span>Casa</button><button data-v="d"><span class="ico">🏢</span>Depa</button><button data-v="t"><span class="ico">🌳</span>Terreno</button></div>
+<div class="bq-paso"><span>3</span>¿Por dónde?</div><div class="bq-ops" data-campo="m"><button data-v="" class="on">📍 Donde sea</button><button data-v="Zapopan">Zapopan</button><button data-v="Guadalajara">Guadalajara</button><button data-v="Tlaquepaque">Tlaquepaque</button><button data-v="Tonalá">Tonalá</button><button data-v="Tlajomulco de Zúñiga">Tlajomulco</button></div>
+<div class="bq-paso"><span>4</span>¿Cuánto tienes?</div><div class="bq-rango"><input type="range" id="bqTope" aria-label="Presupuesto máximo"><b id="bqTopeTxt"></b></div>
+<div class="bq-paso" id="bqRecPaso"><span>5</span>¿Cuántas recámaras?</div><div class="bq-ops" data-campo="r" id="bqRec"><button data-v="0" class="on">Me da igual</button><button data-v="1">1 o más</button><button data-v="2">2 o más</button><button data-v="3">3 o más</button></div>
+<div id="bqResumen"></div>
+<div class="bq-res"><div><div class="bq-lista" id="bqLista"></div></div><div id="bqMapa"></div></div>
+</section>
+<script src="/assets/vendor/leaflet/leaflet.js"></script>
+<script>
+(function(){
+const LF=window.L;
+const AV={S:'/assets/avatares/sofia.svg',D:'/assets/avatares/diego.svg'};
+const ZONA={'Zapopan':'Zapopan es el que más oferta tiene. Por Valle Real, Puerta de Hierro y Andares está lo más caro; hacia Tesistán y la orilla norte encuentras precios más accesibles.',
+ 'Guadalajara':'En Guadalajara estás cerca de todo: Providencia, Chapultepec y la Americana concentran servicios y vida de barrio; el Centro y las colonias tradicionales tienen opciones más accesibles.',
+ 'Tlaquepaque':'Tlaquepaque está a un paso de Guadalajara, con el encanto de su Centro; buena relación entre precio y ubicación.',
+ 'Tonalá':'Tonalá tiene de los precios más accesibles de la zona metropolitana; revisa bien los servicios y las vialidades de cada colonia.',
+ 'Tlajomulco de Zúñiga':'En Tlajomulco hay fraccionamientos nuevos con buen precio por m². Antes de decidir, calcula tus traslados en hora pico por López Mateos o la carretera a Chapala.',
+ '':'En toda la zona metropolitana hay de todo. Si tienes una zona en mente, elígela arriba y afino la búsqueda.'};
+const RANGO={'Vc':[1e6,15e6,25e4,4e6],'Vd':[1e6,10e6,25e4,3e6],'Vt':[3e5,1e7,1e5,2e6],'Rc':[5e3,8e4,1e3,2e4],'Rd':[4e3,5e4,1e3,15e3],'Rt':[5e3,1e5,1e3,2e4]};
+let D=[],ref={},est={o:'V',g:'c',m:'',r:0,tope:null},mapa,capa;
+const $=id=>document.getElementById(id), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const din=v=>'$'+Math.round(v).toLocaleString('es-MX'), corto=v=>v>=1e6?'$'+(v/1e6).toFixed(v>=1e7?0:1).replace('.0','')+'M':'$'+Math.round(v/1e3)+'k';
+const sup=p=>p.g==='t'?p.t:(p.s||0), pm2=p=>sup(p)>0?p.p/sup(p):null;
+const med=a=>{a=a.filter(x=>x).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:null};
+const h=s=>{let x=0;for(const c of s)x=(x*31+c.charCodeAt(0))>>>0;return x};
+function comentario(p){const k=h(p.e),el=(o,i)=>o[(k>>>(i*3))%o.length],f=[],r0=ref[p.m+p.g+p.o],v=pm2(p);
+ if(v&&r0){const d=(v/r0-1)*100,x=Math.abs(d).toFixed(0);
+  if(d<=-45)f.push('Su precio por m² está muy por debajo de la zona: confirma superficie y estado antes de emocionarte');
+  else if(d<=-12)f.push(el([`Está ${x}% abajo del m² de la zona, de lo que más rinde`,`Por m² sale ${x}% más barata que el promedio`,`¡Ojo aquí! ${x}% abajo del m² de la zona`],0));
+  else if(d>=12)f.push(el([`Cuesta ${x}% más por m² que la zona; pregunta qué lo justifica`,`Va ${x}% arriba del m² de la zona; hay margen para negociar`],0));
+  else f.push(el(['Precio por m² justo para la zona','Está en el precio normal de la zona'],0));}
+ if(p.g!=='t'){if(p.r>=3)f.push(el([`${p.r} recámaras: cabe toda la familia`,`Con ${p.r} recámaras hay espacio de sobra`],1));
+  else if(p.r===1&&p.g==='d')f.push(el(['Ideal como primer depa o para rentar','Una recámara: perfecto si vives solo'],1));
+  if(p.t&&p.s&&p.t>p.s*1.4)f.push(`Con ${p.t} m² de terreno hay espacio para crecer`);}
+ else if(p.t)f.push(`Son ${p.t.toLocaleString('es-MX')} m² de terreno`);
+ if(!f.length)f.push('Vale la pena verla en persona');return f.slice(0,2).join('. ')+'.';}
+function tarjeta(p){const q=h(p.e)%2?'S':'D',n=q==='S'?'Sofía':'Diego',u='/ficha.html?eb='+encodeURIComponent(p.e)+'&op='+(p.o==='V'?'VENTA':'RENTA');
+ const meta=[p.c||p.m,p.r?p.r+' rec':'',sup(p)?sup(p)+' m²':''].filter(Boolean).join(' · ');
+ return `<article class="pr-card"><a class="foto" href="${u}">${p.f?`<img src="${esc(p.f)}" alt="" loading="lazy">`:''}<span class="precio">${din(p.p)}${p.o==='R'?'/mes':''}</span></a><div class="cuerpo"><a class="tit" href="${u}" style="text-decoration:none">${esc(p.x)}</a><div class="meta">📍 ${esc(meta)}</div><div class="dice"><img src="${AV[q]}" alt="" width="30" height="30"><span><b>${n}:</b> ${esc(comentario(p))}</span></div><a class="ver" href="${u}">Verla</a></div></article>`;}
+function rango(){const r=RANGO[est.o+est.g],s=$('bqTope');s.min=r[0];s.max=r[1];s.step=r[2];if(est.tope==null||est.tope<r[0]||est.tope>r[1])est.tope=r[3];s.value=est.tope;
+ $('bqTopeTxt').textContent='Hasta '+din(est.tope)+(est.o==='R'?' al mes':'');$('bqRecPaso').style.display=$('bqRec').style.display=est.g==='t'?'none':'';}
+let mostrar=24;
+function pintar(){rango();
+ const L=D.filter(p=>p.o===est.o&&p.g===est.g&&(!est.m||p.m===est.m)&&p.p<=est.tope&&(est.g==='t'||p.r>=est.r));
+ const clave=p=>{const r0=ref[p.m+p.g+p.o],v=pm2(p),x=v&&r0?v/r0:1.5;return x>=.55?x:3+x};
+ L.sort((a,b)=>clave(a)-clave(b)||b.p-a.p);
+ const tipo={c:'casas',d:'depas',t:'terrenos'}[est.g],lugar=est.m||'toda la zona metropolitana';
+ if(!L.length){$('bqResumen').innerHTML=`<div class="pr-burbuja"><img src="${AV.D}" alt="" width="64" height="64"><div class="txt"><b class="n">DIEGO DICE</b>Uy, con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto o prueba otra zona, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
+ const m=med(L.map(p=>p.p)),s=med(L.map(sup)),r=med(L.filter(p=>p.r).map(p=>p.r));
+ const cols={};L.forEach(p=>{if(p.c)(cols[p.c]=cols[p.c]||[]).push(p)});
+ const rinde=Object.entries(cols).filter(([,l])=>l.length>=3).map(([c,l])=>[c,med(l.map(sup))/med(l.map(p=>p.p))]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
+ $('bqResumen').innerHTML=`<div class="pr-burbuja"><img src="${AV.S}" alt="" width="64" height="64"><div class="txt"><b class="n">SOFÍA DICE</b>¡Va! Encontré <b>${L.length} ${tipo}</b> para ${est.o==='V'?'comprar':'rentar'} en ${esc(lugar)} de hasta ${din(est.tope)}${est.o==='R'?' al mes':''}. La mitad cuesta menos de <b>${din(m)}</b>${s?` y lo típico son <b>${Math.round(s)} m²</b>`:''}${r&&est.g!=='t'?` con <b>${r} recámaras</b>`:''}.${rinde.length?` Donde más rinde tu lana: <b>${rinde.map(esc).join(', ')}</b>.`:''}</div></div>
+ <div class="pr-burbuja der"><img src="${AV.D}" alt="" width="64" height="64"><div class="txt"><b class="n">DIEGO DICE</b>${esc(ZONA[est.m])} Te las puse de las que más rinden a las que menos.</div></div>`;
+ $('bqLista').innerHTML=L.slice(0,mostrar).map(tarjeta).join('')+(L.length>mostrar?`<div class="bq-mas"><button class="pr-cta" id="bqMas" style="border:0;cursor:pointer">Ver ${Math.min(24,L.length-mostrar)} más</button></div>`:'');
+ const b=$('bqMas');if(b)b.onclick=()=>{mostrar+=24;pintar()};
+ capa.clearLayers();const pts=[];L.slice(0,300).forEach((p,i)=>{if(!p.a)return;const mk=i<40?LF.marker([p.a,p.n],{zIndexOffset:i<10?1000:(40-i)*10,icon:LF.divIcon({className:'',html:`<span class="pin-precio${i<10?' top':''}">${corto(p.p)}</span>`,iconSize:null})}):LF.circleMarker([p.a,p.n],{radius:5,color:'#fff',weight:1.5,fillColor:'#E07812',fillOpacity:.85});
+  mk.bindPopup(`<div style="width:200px">${p.f?`<img src="${esc(p.f)}" style="width:100%;height:110px;object-fit:cover;border-radius:8px">`:''}<b>${din(p.p)}</b><br>${esc(p.x)}<br><a href="/ficha.html?eb=${encodeURIComponent(p.e)}&op=${p.o==='V'?'VENTA':'RENTA'}" style="color:#E07812;font-weight:800">Verla →</a></div>`);mk.addTo(capa);pts.push([p.a,p.n]);});
+ if(pts.length)mapa.fitBounds(pts,{padding:[30,30],maxZoom:14});
+ history.replaceState(null,'','#'+new URLSearchParams({o:est.o,g:est.g,m:est.m,r:est.r,tope:est.tope}));}
+document.querySelectorAll('.bq-ops').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+ const c=g.dataset.campo;est[c]=c==='r'?+b.dataset.v:b.dataset.v;if(c==='o'||c==='g')est.tope=null;mostrar=24;pintar();}));
+$('bqTope').addEventListener('input',e=>{est.tope=+e.target.value;mostrar=24;pintar();});
+mapa=LF.map('bqMapa',{scrollWheelZoom:false}).setView([20.67,-103.38],11);
+LF.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(mapa);capa=LF.layerGroup().addTo(mapa);
+const q=new URLSearchParams(location.hash.slice(1));['o','g','m'].forEach(k=>{if(q.has(k))est[k]=q.get(k)});if(q.has('r'))est.r=+q.get('r');if(q.has('tope'))est.tope=+q.get('tope');
+document.querySelectorAll('.bq-ops').forEach(g=>{const c=g.dataset.campo;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',String(b.dataset.v)===String(est[c])))});
+fetch('/presupuesto/buscador.json').then(r=>r.json()).then(j=>{D=j;const gr={};D.forEach(p=>{const v=pm2(p);if(v)(gr[p.m+p.g+p.o]=gr[p.m+p.g+p.o]||[]).push(v)});for(const k in gr)ref[k]=med(gr[k]);pintar();});
+})();
+</script>'''
 
 
 def cabeza(titulo, desc, canon, img=None, extra=""):
@@ -265,8 +352,10 @@ def main():
     h = cabeza("¿Cuánto tienes? Casas, departamentos y terrenos por presupuesto en Guadalajara | inmobiliaria.pro",
                "Dinos tu presupuesto y Sofía y Diego te enseñan qué casas, departamentos y terrenos alcanzan en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco.", "/presupuesto/")
     h += '<h1 class="pr-h1">¿Cuánto tienes? Te enseñamos qué alcanza</h1><p class="pr-sub">Elige tu municipio y tu presupuesto · actualizado al ' + HOY + "</p>"
-    h += burbuja("Sofía", "Hola, soy Sofía. Con Diego revisamos todas las propiedades para decirte, sin rodeos, qué te alcanza con tu dinero y dónde rinde más.")
-    h += burbuja("Diego", "Y si algo te late, te ayudamos a revisarlo antes de que des un peso. Empieza eligiendo tu zona 👇", derecha=True)
+    h += burbuja("Sofía", "¡Qué onda! Soy Sofía. Con Diego le echamos un ojo a todas las propiedades de la Perla Tapatía para decirte, sin rodeos, qué te alcanza y dónde rinde más tu lana.")
+    h += burbuja("Diego", "Contéstanos cuatro cositas y te enseñamos las que valen la pena, en lista y en el mapa. ¿Le entramos? 👇", derecha=True)
+    h += BUSCADOR
+    h += '<h2 class="pr-h1" style="font-size:1.4rem;margin-top:28px">O ve directo a tu zona y presupuesto</h2>'
     for zona in ["Toda la ZMG"] + munis:
         if zona not in indice:
             continue
@@ -280,6 +369,12 @@ def main():
     os.makedirs(os.path.join(RAIZ, "presupuesto"), exist_ok=True)
     open(os.path.join(RAIZ, "presupuesto", "index.html"), "w", encoding="utf-8").write(h + PIE)
     urls.insert(0, "/presupuesto/")
+    ligero = [{"e": p["eb"], "o": p["operacion"][0], "g": p["grupo"][0], "m": p["municipio"], "c": p["colonia"], "p": round(p["precio"]),
+               "r": int(p["recamaras"]) if p.get("recamaras") else 0, "s": round(p.get("construccion") or p.get("m2") or 0),
+               "t": round(p.get("terreno") or 0), "f": p.get("foto") or "", "a": round(p["lat"], 5) if p.get("lat") else None,
+               "n": round(p["lon"], 5) if p.get("lon") else None, "x": p["titulo"].split(" | ")[0][:90]} for p in props]
+    with open(os.path.join(RAIZ, "presupuesto", "buscador.json"), "w", encoding="utf-8") as fh:
+        json.dump(ligero, fh, ensure_ascii=False, separators=(",", ":"))
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(
         f"<url><loc>{SITIO}{u}</loc><lastmod>{HOY}</lastmod></url>" for u in urls) + "\n</urlset>\n"
     open(os.path.join(RAIZ, "sitemap-presupuesto.xml"), "w", encoding="utf-8").write(xml)

@@ -96,6 +96,53 @@ def comentario(p, ref_pm2):
     return ". ".join(frases[:2]) + "."
 
 
+def mensualidad(precio, enganche=0.2, tasa=0.1013, anios=20):
+    r, n = tasa / 12, anios * 12
+    m = precio * (1 - enganche)
+    return m * r / (1 - (1 + r) ** -n)
+
+
+def explicacion(p, ref_pm2):
+    """Lo bueno, ojo con esto, para quién es y recomendación, con los datos de la propiedad."""
+    h = int(hashlib.md5(p["eb"].encode()).hexdigest(), 16)
+    elige = lambda o, k=0: o[(h >> (k * 4)) % len(o)]
+    v, r = pm2(p), int(p.get("recamaras") or 0)
+    s = p.get("construccion") or p.get("m2") or 0
+    d = (v / ref_pm2 - 1) * 100 if v and ref_pm2 else None
+    bueno, ojo, para = [], [], ""
+    if d is not None:
+        if -45 < d <= -12:
+            bueno.append(elige([f"Por m² sale {abs(d):.0f}% más barata que el promedio de la zona", f"Está {abs(d):.0f}% abajo del m² de la zona: de las que más rinden"]))
+        elif d <= -45:
+            ojo.append("Su precio por m² está demasiado abajo de la zona: confirma la superficie real y el estado")
+        elif d >= 12:
+            ojo.append(f"Su m² va {d:.0f}% arriba del promedio: pregunta qué lo justifica y negocia")
+        else:
+            bueno.append("Su precio por m² es justo para la zona")
+    if p["grupo"] != "terreno":
+        if r >= 3:
+            bueno.append(f"{r} recámaras")
+        if p.get("terreno") and s and p["terreno"] > s * 1.4:
+            bueno.append(f"{round(p['terreno'])} m² de terreno, con espacio para crecer")
+        if r and s and s / r < 22:
+            ojo.append(f"Espacios compactos: unos {round(s / r)} m² por recámara")
+        para = ("una familia que necesita espacio" if r >= 3 else "una pareja o tu primer depa" if r == 2 and p["grupo"] == "departamento"
+                else "vivir solo o invertir para rentar" if r == 1 else "quien busca su primera casa" if p["grupo"] == "casa" else "quien busca buena ubicación")
+    else:
+        if p.get("terreno"):
+            bueno.append(f"{round(p['terreno']):,} m² de terreno")
+        para = "quien quiere construir a su gusto o invertir a largo plazo"
+    if p["operacion"] == "RENTA":
+        consejo = f"Para rentarla suelen pedir ingresos de unas 3 veces la renta (alrededor de {dinero(p['precio'] * 3)} al mes) y depósito de 1 a 2 meses. Pide contrato por escrito."
+    elif p["grupo"] == "terreno":
+        consejo = "Antes de apartar, pide el uso de suelo y confirma que agua, luz y drenaje lleguen hasta el lote."
+    else:
+        m = mensualidad(p["precio"])
+        consejo = f"Con 20% de enganche ({dinero(p['precio'] * 0.2)}), la mensualidad rondaría {dinero(m)} a 20 años; te pedirían ingresos de unos {dinero(m / 0.3)} al mes. Y antes de firmar, pide una revisión."
+    return {"bueno": "; ".join(bueno[:2]) or "Vale la pena verla en persona", "ojo": "; ".join(ojo[:2]) or "Nada raro en los datos; confírmalo en la visita",
+            "para": para[0].upper() + para[1:], "consejo": consejo}
+
+
 def cargar():
     data = json.load(open(os.path.join(RAIZ, "data.json"), encoding="utf-8"))
     out = []
@@ -116,7 +163,9 @@ CSS = """
 .pr-migas{font-size:14px;color:#5b6575;margin-bottom:10px}.pr-migas a{color:#5b6575}
 .pr-h1{font-size:clamp(1.6rem,4.4vw,2.4rem);line-height:1.15;color:#13233A;margin:4px 0 6px;font-weight:800}
 .pr-sub{color:#5b6575;margin:0 0 18px}
-.pr-burbuja{display:flex;gap:14px;align-items:flex-start;margin:14px 0}.pr-burbuja img{width:64px;height:64px;flex:none}
+.pr-burbuja{display:flex;gap:14px;align-items:flex-end;margin:16px 0}.pr-burbuja figure{margin:0;flex:none;text-align:center}.pr-burbuja figure img{width:104px;height:auto;display:block}
+.pr-burbuja figcaption{font-size:.75rem;font-weight:800;color:#13233A;background:#F5A04A;border-radius:999px;padding:2px 10px;display:inline-block;margin-top:-6px}
+.pr-duo{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:8px 0 0}.pr-duo img{width:min(42vw,200px);height:auto}
 .pr-burbuja .txt{background:#fff;border-radius:4px 18px 18px 18px;padding:14px 16px;box-shadow:0 2px 10px rgba(19,35,58,.08);line-height:1.6;position:relative}
 .pr-burbuja .txt b.n{display:block;color:#E07812;font-size:.85rem;letter-spacing:.04em;margin-bottom:2px}
 .pr-burbuja.der{flex-direction:row-reverse}.pr-burbuja.der .txt{border-radius:18px 4px 18px 18px;background:#FFF6EC}
@@ -129,8 +178,10 @@ CSS = """
 .pr-card .cuerpo{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
 .pr-card .tit{font-weight:700;color:#13233A;line-height:1.3;font-size:.98rem}
 .pr-card .meta{font-size:.84rem;color:#5b6575}
-.pr-card .dice{display:flex;gap:8px;align-items:flex-start;background:#FFF6EC;border-radius:12px;padding:8px 10px;font-size:.86rem;line-height:1.45}
-.pr-card .dice img{width:30px;height:30px;flex:none}
+.pr-card .dice{display:block;background:#FFF6EC;border-radius:14px;padding:10px 11px;font-size:.84rem;line-height:1.45}
+.pr-card .dice::after{content:"";display:block;clear:both}
+.pr-card .dice img{float:left;width:44px;height:auto;margin:0 8px 2px 0}.pr-card .dice > div > b:first-child{display:block;padding-top:8px;min-height:30px}.pr-card .dice b{color:#13233A}.pr-card .dice p{margin:4px 0 0}
+.pr-card .dice p.tip{background:#fff;border-radius:10px;padding:6px 8px;margin-top:6px;border-left:3px solid #E07812}
 .pr-card .ver{margin-top:auto;text-align:center;background:#13233A;color:#fff;border-radius:999px;padding:9px;font-weight:700;text-decoration:none}
 .pr-sec{background:#fff;border-radius:20px;padding:18px 20px;margin-top:20px;box-shadow:0 2px 10px rgba(19,35,58,.06)}
 .pr-sec h2{color:#13233A;font-size:1.25rem;margin:0 0 10px}
@@ -152,6 +203,7 @@ CSS = """
 .pin-precio.top{background:#13233A;color:#F5A04A}
 .bq-lista{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bq-mas{grid-column:1/-1;text-align:center}
 .bq-vacio{background:#FFF6EC;border-radius:16px;padding:16px;line-height:1.6}
+@media(max-width:600px){.pr-burbuja figure img{width:78px}}
 @media(max-width:900px){.bq-res{grid-template-columns:1fr}#bqMapa{height:380px;position:relative;order:-1}.bq-lista{grid-template-columns:1fr}}
 """
 
@@ -195,9 +247,20 @@ function comentario(p){const k=h(p.e),el=(o,i)=>o[(k>>>(i*3))%o.length],f=[],r0=
   if(p.t&&p.s&&p.t>p.s*1.4)f.push(`Con ${p.t} m² de terreno hay espacio para crecer`);}
  else if(p.t)f.push(`Son ${p.t.toLocaleString('es-MX')} m² de terreno`);
  if(!f.length)f.push('Vale la pena verla en persona');return f.slice(0,2).join('. ')+'.';}
+function explica(p){const k=h(p.e),el=(o,i)=>o[(k>>>(i*3))%o.length],r0=ref[p.m+p.g+p.o],v=pm2(p),s=p.s||0,d=v&&r0?(v/r0-1)*100:null,bueno=[],ojo=[];let para='';
+ if(d!==null){if(d>-45&&d<=-12)bueno.push(el([`Por m² sale ${Math.abs(d).toFixed(0)}% más barata que el promedio de la zona`,`Está ${Math.abs(d).toFixed(0)}% abajo del m² de la zona: de las que más rinden`],0));
+  else if(d<=-45)ojo.push('Su precio por m² está demasiado abajo de la zona: confirma la superficie real y el estado');
+  else if(d>=12)ojo.push(`Su m² va ${d.toFixed(0)}% arriba del promedio: pregunta qué lo justifica y negocia`);else bueno.push('Su precio por m² es justo para la zona');}
+ if(p.g!=='t'){if(p.r>=3)bueno.push(p.r+' recámaras');if(p.t&&s&&p.t>s*1.4)bueno.push(p.t+' m² de terreno, con espacio para crecer');if(p.r&&s&&s/p.r<22)ojo.push(`Espacios compactos: unos ${Math.round(s/p.r)} m² por recámara`);
+  para=p.r>=3?'Una familia que necesita espacio':(p.r===2&&p.g==='d')?'Una pareja o tu primer depa':p.r===1?'Vivir solo o invertir para rentar':p.g==='c'?'Quien busca su primera casa':'Quien busca buena ubicación';}
+ else{if(p.t)bueno.push(p.t.toLocaleString('es-MX')+' m² de terreno');para='Quien quiere construir a su gusto o invertir a largo plazo';}
+ let tip;if(p.o==='R')tip=`Para rentarla suelen pedir ingresos de unas 3 veces la renta (alrededor de ${din(p.p*3)} al mes) y depósito de 1 a 2 meses. Pide contrato por escrito.`;
+ else if(p.g==='t')tip='Antes de apartar, pide el uso de suelo y confirma que agua, luz y drenaje lleguen hasta el lote.';
+ else{const r=.1013/12,n=240,m=p.p*.8*r/(1-Math.pow(1+r,-n));tip=`Con 20% de enganche (${din(p.p*.2)}), la mensualidad rondaría ${din(m)} a 20 años; te pedirían ingresos de unos ${din(m/.3)} al mes. Y antes de firmar, pide una revisión.`;}
+ return{bueno:bueno.slice(0,2).join('; ')||'Vale la pena verla en persona',ojo:ojo.slice(0,2).join('; ')||'Nada raro en los datos; confírmalo en la visita',para,tip};}
 function tarjeta(p){const q=h(p.e)%2?'S':'D',n=q==='S'?'Sofía':'Diego',u='/ficha.html?eb='+encodeURIComponent(p.e)+'&op='+(p.o==='V'?'VENTA':'RENTA');
  const meta=[p.c||p.m,p.r?p.r+' rec':'',sup(p)?sup(p)+' m²':''].filter(Boolean).join(' · ');
- return `<article class="pr-card"><a class="foto" href="${u}">${p.f?`<img src="${esc(p.f)}" alt="" loading="lazy">`:''}<span class="precio">${din(p.p)}${p.o==='R'?'/mes':''}</span></a><div class="cuerpo"><a class="tit" href="${u}" style="text-decoration:none">${esc(p.x)}</a><div class="meta">📍 ${esc(meta)}</div><div class="dice"><img src="${AV[q]}" alt="" width="30" height="30"><span><b>${n}:</b> ${esc(comentario(p))}</span></div><a class="ver" href="${u}">Verla</a></div></article>`;}
+ return `<article class="pr-card"><a class="foto" href="${u}">${p.f?`<img src="${esc(p.f)}" alt="" loading="lazy">`:''}<span class="precio">${din(p.p)}${p.o==='R'?'/mes':''}</span></a><div class="cuerpo"><a class="tit" href="${u}" style="text-decoration:none">${esc(p.x)}</a><div class="meta">📍 ${esc(meta)}</div>${(x=>`<div class="dice"><img src="${AV[q]}" alt="" width="46" height="50"><div><b>${n} te explica</b><p>👍 <b>Lo bueno:</b> ${esc(x.bueno)}.</p><p>⚠️ <b>Ojo:</b> ${esc(x.ojo)}.</p><p>🎯 <b>Para:</b> ${esc(x.para)}.</p><p class="tip">💡 ${esc(x.tip)}</p></div></div>`)(explica(p))}<a class="ver" href="${u}">Verla</a></div></article>`;}
 function rango(){const r=RANGO[est.o+est.g],s=$('bqTope');s.min=r[0];s.max=r[1];s.step=r[2];if(est.tope==null||est.tope<r[0]||est.tope>r[1])est.tope=r[3];s.value=est.tope;
  $('bqTopeTxt').textContent='Hasta '+din(est.tope)+(est.o==='R'?' al mes':'');$('bqRecPaso').style.display=$('bqRec').style.display=est.g==='t'?'none':'';}
 let mostrar=24;
@@ -206,12 +269,12 @@ function pintar(){rango();
  const clave=p=>{const r0=ref[p.m+p.g+p.o],v=pm2(p),x=v&&r0?v/r0:1.5;return x>=.55?x:3+x};
  L.sort((a,b)=>clave(a)-clave(b)||b.p-a.p);
  const tipo={c:'casas',d:'depas',t:'terrenos'}[est.g],lugar=est.m||'toda la zona metropolitana';
- if(!L.length){$('bqResumen').innerHTML=`<div class="pr-burbuja"><img src="${AV.D}" alt="" width="64" height="64"><div class="txt"><b class="n">DIEGO DICE</b>Uy, con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto o prueba otra zona, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
+ if(!L.length){$('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.D}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Uy, con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto o prueba otra zona, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
  const m=med(L.map(p=>p.p)),s=med(L.map(sup)),r=med(L.filter(p=>p.r).map(p=>p.r));
  const cols={};L.forEach(p=>{if(p.c)(cols[p.c]=cols[p.c]||[]).push(p)});
  const rinde=Object.entries(cols).filter(([,l])=>l.length>=3).map(([c,l])=>[c,med(l.map(sup))/med(l.map(p=>p.p))]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
- $('bqResumen').innerHTML=`<div class="pr-burbuja"><img src="${AV.S}" alt="" width="64" height="64"><div class="txt"><b class="n">SOFÍA DICE</b>¡Va! Encontré <b>${L.length} ${tipo}</b> para ${est.o==='V'?'comprar':'rentar'} en ${esc(lugar)} de hasta ${din(est.tope)}${est.o==='R'?' al mes':''}. La mitad cuesta menos de <b>${din(m)}</b>${s?` y lo típico son <b>${Math.round(s)} m²</b>`:''}${r&&est.g!=='t'?` con <b>${r} recámaras</b>`:''}.${rinde.length?` Donde más rinde tu lana: <b>${rinde.map(esc).join(', ')}</b>.`:''}</div></div>
- <div class="pr-burbuja der"><img src="${AV.D}" alt="" width="64" height="64"><div class="txt"><b class="n">DIEGO DICE</b>${esc(ZONA[est.m])} Te las puse de las que más rinden a las que menos.</div></div>`;
+ $('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.S}" alt="" width="104" height="113"><figcaption>Sofía</figcaption></figure><div class="txt"><b class="n">SOFÍA DICE</b>¡Va! Encontré <b>${L.length} ${tipo}</b> para ${est.o==='V'?'comprar':'rentar'} en ${esc(lugar)} de hasta ${din(est.tope)}${est.o==='R'?' al mes':''}. La mitad cuesta menos de <b>${din(m)}</b>${s?` y lo típico son <b>${Math.round(s)} m²</b>`:''}${r&&est.g!=='t'?` con <b>${r} recámaras</b>`:''}.${rinde.length?` Donde más rinde tu lana: <b>${rinde.map(esc).join(', ')}</b>.`:''}</div></div>
+ <div class="pr-burbuja der"><figure><img src="${AV.D}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>${esc(ZONA[est.m])} Te las puse de las que más rinden a las que menos.</div></div>`;
  $('bqLista').innerHTML=L.slice(0,mostrar).map(tarjeta).join('')+(L.length>mostrar?`<div class="bq-mas"><button class="pr-cta" id="bqMas" style="border:0;cursor:pointer">Ver ${Math.min(24,L.length-mostrar)} más</button></div>`:'');
  const b=$('bqMas');if(b)b.onclick=()=>{mostrar+=24;pintar()};
  capa.clearLayers();const pts=[];L.slice(0,300).forEach((p,i)=>{if(!p.a)return;const mk=i<40?LF.marker([p.a,p.n],{zIndexOffset:i<10?1000:(40-i)*10,icon:LF.divIcon({className:'',html:`<span class="pin-precio${i<10?' top':''}">${corto(p.p)}</span>`,iconSize:null})}):LF.circleMarker([p.a,p.n],{radius:5,color:'#fff',weight:1.5,fillColor:'#E07812',fillOpacity:.85});
@@ -251,7 +314,13 @@ PIE = """<p class="pr-aviso">Sofía y Diego son asesores virtuales de inmobiliar
 
 
 def burbuja(nombre, texto, derecha=False):
-    return f'<div class="pr-burbuja{" der" if derecha else ""}"><img src="{AVATAR[nombre]}" alt="{nombre}, asesor virtual" width="64" height="64"><div class="txt"><b class="n">{nombre.upper()} DICE</b>{texto}</div></div>'
+    return f'<div class="pr-burbuja{" der" if derecha else ""}"><figure><img src="{AVATAR[nombre]}" alt="{nombre}, asesor virtual" width="104" height="113"><figcaption>{nombre}</figcaption></figure><div class="txt"><b class="n">{nombre.upper()} DICE</b>{texto}</div></div>'
+
+
+def bloque_explica(q, x):
+    return (f'<div class="dice"><img src="{AVATAR[q]}" alt="{q}" width="46" height="50"><div><b>{q} te explica</b>'
+            f'<p>👍 <b>Lo bueno:</b> {E(x["bueno"])}.</p><p>⚠️ <b>Ojo:</b> {E(x["ojo"])}.</p><p>🎯 <b>Para:</b> {E(x["para"])}.</p>'
+            f'<p class="tip">💡 {E(x["consejo"])}</p></div></div>')
 
 
 def tarjeta(p, ref):
@@ -262,7 +331,7 @@ def tarjeta(p, ref):
     url = f"/ficha.html?eb={E(p['eb'])}&amp;op={E(p['operacion'])}"
     return f"""<article class="pr-card"><a class="foto" href="{url}">{foto}<span class="precio">{dinero(p['precio'])}{'/mes' if p['operacion'] == 'RENTA' else ''}</span></a>
 <div class="cuerpo"><a class="tit" href="{url}" style="text-decoration:none">{E(p['titulo'].split(' | ')[0])}</a><div class="meta">📍 {E(meta)}</div>
-<div class="dice"><img src="{AVATAR[q]}" alt="{q}" width="30" height="30"><span><b>{q}:</b> {E(comentario(p, ref))}</span></div>
+{bloque_explica(q, explicacion(p, ref))}
 <a class="ver" href="{url}">Verla</a></div></article>"""
 
 
@@ -352,6 +421,7 @@ def main():
     h = cabeza("¿Cuánto tienes? Casas, departamentos y terrenos por presupuesto en Guadalajara | inmobiliaria.pro",
                "Dinos tu presupuesto y Sofía y Diego te enseñan qué casas, departamentos y terrenos alcanzan en Guadalajara, Zapopan, Tlaquepaque, Tonalá y Tlajomulco.", "/presupuesto/")
     h += '<h1 class="pr-h1">¿Cuánto tienes? Te enseñamos qué alcanza</h1><p class="pr-sub">Elige tu municipio y tu presupuesto · actualizado al ' + HOY + "</p>"
+    h += '<div class="pr-duo"><img src="/assets/avatares/sofia.svg" alt="Sofía, asesora virtual" width="200" height="217"><img src="/assets/avatares/diego.svg" alt="Diego, asesor virtual" width="200" height="217"></div>'
     h += burbuja("Sofía", "¡Qué onda! Soy Sofía. Con Diego le echamos un ojo a todas las propiedades de la Perla Tapatía para decirte, sin rodeos, qué te alcanza y dónde rinde más tu lana.")
     h += burbuja("Diego", "Contéstanos cuatro cositas y te enseñamos las que valen la pena, en lista y en el mapa. ¿Le entramos? 👇", derecha=True)
     h += BUSCADOR

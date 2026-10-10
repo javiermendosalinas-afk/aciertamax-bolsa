@@ -1,13 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Diego, asesor virtual de inmobiliaria.pro">
-<circle cx="60" cy="60" r="60" fill="#DCE6F2"/>
-<path d="M25 112c4-22 19-32 35-32s31 10 35 32a60 60 0 0 1-70 0z" fill="#13233A"/>
-<path d="M52 80h16l4 8-12 8-12-8z" fill="#FFFFFF"/>
-<path d="M50 78h20l-2 9h-16z" fill="#D9A27C"/>
-<ellipse cx="60" cy="58" rx="23" ry="25" fill="#E3AE86"/>
-<path d="M36 52c-2-20 10-30 26-30 14 0 25 8 24 28-6-10-16-14-27-13-9 1-17 6-23 15z" fill="#2B2320"/>
-<path d="M40 64c2 14 10 20 20 20s18-6 20-20c-3 6-8 9-20 9s-17-3-20-9z" fill="#3A2E29" opacity=".85"/>
-<circle cx="51" cy="57" r="2.8" fill="#13233A"/><circle cx="69" cy="57" r="2.8" fill="#13233A"/>
-<path d="M45 50q6-3 11 0M64 50q6-3 11 0" stroke="#2B2320" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-<path d="M51 68q9 7 18 0" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"/>
-<ellipse cx="36" cy="59" rx="3" ry="5" fill="#E3AE86"/><ellipse cx="84" cy="59" rx="3" ry="5" fill="#E3AE86"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Diego, asesor virtual de inmobiliaria.pro">
+<ellipse cx="120" cy="250" rx="80" ry="8" fill="#13233A" opacity=".08"/>
+<path d="M54 256c2-46 28-74 66-74s64 28 66 74z" fill="#13233A"/>
+<path d="M104 184h32l-16 22z" fill="#fff"/><path d="M116 188h8l3 30-7 8-7-8z" fill="#E07812"/>
+<path d="M164 206c14 6 24 20 26 36" stroke="#13233A" stroke-width="20" stroke-linecap="round" fill="none"/>
+<path d="M74 204c-14 10-22 26-20 40" stroke="#13233A" stroke-width="20" stroke-linecap="round" fill="none"/>
+<circle cx="190" cy="242" r="12" fill="#E3AE86"/>
+<g transform="translate(176 212) rotate(-20)"><circle r="9" fill="none" stroke="#F5A04A" stroke-width="4"/><path d="M8 0h22M22 0v7M28 0v6" stroke="#F5A04A" stroke-width="4" stroke-linecap="round"/></g>
+<path d="M108 168h24l-3 16h-18z" fill="#D9A27C"/>
+<ellipse cx="120" cy="112" rx="40" ry="44" fill="#E3AE86"/>
+<path d="M78 104c-4-36 16-54 44-54 26 0 46 16 42 50-10-16-28-24-48-22-16 2-30 10-38 26z" fill="#2B2320"/>
+<path d="M84 124c4 24 18 36 36 36s32-12 36-36c-6 10-14 16-36 16s-30-6-36-16z" fill="#3A2E29" opacity=".9"/>
+<ellipse cx="105" cy="110" rx="5" ry="6" fill="#13233A"/><ellipse cx="135" cy="110" rx="5" ry="6" fill="#13233A"/>
+<circle cx="107" cy="108" r="1.6" fill="#fff"/><circle cx="137" cy="108" r="1.6" fill="#fff"/>
+<path d="M94 96q10-6 20 0M126 96q10-6 20 0" stroke="#2B2320" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M104 130q16 12 32 0" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+<ellipse cx="80" cy="114" rx="5" ry="9" fill="#E3AE86"/><ellipse cx="160" cy="114" rx="5" ry="9" fill="#E3AE86"/>
 </svg>

@@ -10,9 +10,10 @@
     bellavittoria: { t: '🏢 Ver Bella Vittoria', u: 'https://residencialbellavittoria.com' },
     eleve: { t: '🏙️ Ver Élevé Valle Real', u: 'https://acierta.pro/blog/eleve-valle-real-zapopan.html' },
     villadhara: { t: '🌳 Ver Villa Dhara', u: 'https://acierta.pro/blog/villa-dhara-parque-morelos.html' },
+    ideas: { t: '🛋️ Ideas de decoración e interiorismo', u: 'https://acierta.pro/blog/' },
     whatsapp: { t: '💬 Hablar con un asesor', u: 'https://wa.me/523333777337?text=' + encodeURIComponent('Hola, vengo de inmobiliaria.pro y quiero hablar con un asesor') }
   };
-  const SUG = ['¿Cuánto me presta el banco?', '¿Cómo uso mi Infonavit?', '¿Qué desarrollos me recomiendas?', '¿Qué es Acierta Verifica?'];
+  const SUG = ['¿Cuánto me presta el banco?', '¿Cómo uso mi Infonavit?', '¿Qué desarrollos me recomiendas?', '¿Qué es Acierta Verifica?', '¿Qué papeles pido antes de comprar?', 'Ideas para decorar un depa chico'];
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let historial = [], endpoint = 'https://aciertamax-webhook.onrender.com/api/sofia', abierto = false, enRecorrido = /te-acompanamos/.test(location.pathname);
   fetch('/camino-datos.json').then(r => r.json()).then(j => { if (j.endpoint) endpoint = j.endpoint.replace(/\/api\/camino.*$/, '/api/sofia'); }).catch(() => {});
@@ -60,7 +61,7 @@
     document.body.appendChild(capa); document.body.style.overflow = 'hidden';
     const lista = capa.querySelector('#pqLista');
     capa.querySelector('.cab button').onclick = cerrar; capa.onclick = (e) => { if (e.target === capa) cerrar(); };
-    if (!historial.length) burbuja(lista, 'ia', '¡Qué onda! Pregúntanos lo que quieras: crédito, Infonavit, zonas, desarrollos, cómo revisar una casa antes de comprar… Te contestamos como amigos que saben del tema.', 'Sofía');
+    if (!historial.length) burbuja(lista, 'ia', '¡Qué onda! Pregúntanos lo que quieras: crédito, Infonavit, zonas, desarrollos, escrituras y contratos, cómo revisar una casa antes de comprar, y hasta ideas para decorarla. Te contestamos como amigos que saben del tema.', 'Sofía');
     historial.forEach(h => burbuja(lista, h.rol === 'usuario' ? 'yo' : 'ia', h.texto, h.quien, h.acciones));
     capa.querySelectorAll('#pqSug button').forEach(b => b.onclick = () => enviar(b.textContent));
     capa.querySelector('#pqForm').onsubmit = (e) => { e.preventDefault(); const v = capa.querySelector('#pqIn').value.trim(); if (v) enviar(v); };

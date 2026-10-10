@@ -37,6 +37,10 @@ body{background:var(--papel);font-family:'Plus Jakarta Sans',system-ui,sans-seri
 .error{color:#B42318;font-weight:600;flex-basis:100%;font-size:.9rem}
 .resumen{background:#fff;border-radius:18px;padding:14px 16px;margin:8px 0 0 74px;line-height:1.7;font-size:.92rem}
 .hp{position:absolute;left:-9999px}
+.vozbtn{border:2px solid var(--ambar);background:#fff;color:var(--navy);border-radius:999px;padding:6px 12px;font:inherit;font-weight:800;font-size:.82rem;cursor:pointer;margin-top:4px}.vozbtn.on{background:var(--ambar);color:#fff}
+.mic{flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px}.mic button{border:0;background:var(--navy);color:#fff;border-radius:999px;padding:12px 18px;font:inherit;font-weight:800;cursor:pointer;display:flex;gap:8px;align-items:center}
+.mic button.oye{background:#E5484D;animation:latido 1s infinite}.mic small{color:var(--gris)}@keyframes latido{50%{transform:scale(1.06)}}
+@media(prefers-reduced-motion:reduce){.mic button.oye{animation:none}}
 .prop .pts{position:absolute;left:8px;top:8px;background:var(--navy);color:var(--ambar2);font-weight:800;border-radius:999px;padding:4px 10px;font-size:.82rem}
 .prop .elegir{display:block;width:calc(100% - 20px);margin:0 10px 10px;border:2px solid var(--ambar);background:#fff;color:var(--navy);border-radius:999px;padding:8px;font:inherit;font-weight:800;cursor:pointer}
 .prop.on{outline:4px solid var(--ambar)}.prop.on .elegir{background:var(--ambar);color:#fff}
@@ -75,13 +79,14 @@ body{background:var(--papel);font-family:'Plus Jakarta Sans',system-ui,sans-seri
 <a class="header-cta" href="https://wa.me/523333777337?text=Hola%2C%20vengo%20de%20inmobiliaria.pro" target="_blank" rel="noopener">WhatsApp</a>
 </div></header>
 <main class="ac">
-<div class="ac-barra" aria-hidden="true"><div class="riel"><i id="riel"></i></div><small id="rielTxt">Empezamos</small></div>
+<div class="ac-barra"><div class="riel" aria-hidden="true"><i id="riel"></i></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><small id="rielTxt">Empezamos</small><button type="button" id="btnVoz" class="vozbtn">🎙️ Platicar con voz</button></div></div>
 <div id="chat" aria-live="polite"></div>
 <div id="resp"></div>
 <input class="hp" id="empresa" tabindex="-1" autocomplete="off" aria-hidden="true">
 </main>
 <script src="/assets/vendor/leaflet/leaflet.js"></script>
 <script src="/js/juego.js"></script>
+<script src="/js/voz.js"></script>
 <script>
 (function(){
 'use strict';
@@ -98,9 +103,44 @@ fetch('/camino-datos.json').then(r=>r.json()).then(j=>{CFG=Object.assign(CFG,j)}
 const cargarDatos=()=>DATA?Promise.resolve(DATA):fetch('/presupuesto/buscador.json').then(r=>r.json()).then(j=>DATA=j).catch(()=>DATA=[]);
 cargarDatos();
 
+// ---------- voz: hablar y escuchar ----------
+let ULT=null;
+const SIN={compra:'comprar compra adquirir',renta:'rentar renta alquilar',casa:'casa',departamento:'depa departamento',terreno:'terreno lote',vivir:'vivir',invertir:'invertir inversion',
+ solo:'solo sola',pareja:'pareja esposa esposo novia novio',familia:'familia hijos ninos',roomies:'roomies amigos companeros',banco:'banco bancario hipoteca',infonavit:'infonavit',cofinavit:'cofinavit',
+ fovissste:'fovissste',contado:'contado efectivo cash',nose:'no se',nomina:'nomina asalariado empleado',independiente:'independiente honorarios freelance',negocio:'negocio empresa',pensionado:'pension pensionado jubilado',
+ ya:'ya pronto urgente antes posible',['1a3']:'meses tres',mas3:'explorando despues adelante',socio:'socio socios',precio:'precio barato costo dinero',ubicacion:'ubicacion cerca traslado trafico',
+ espacio:'espacio grande amplio metros',seguridad:'seguridad seguro coto vigilancia',amenidades:'amenidades alberca gimnasio gym',lista:'lista nueva habitar estrenar',cualquiera:'igual cualquiera donde sea',
+ ok:'listo sigamos siguiente comparar bien',aplicar:'usar aplicar escenario',igual:'seguir mis numeros igual'};
+const NUMP={un:'1',uno:'1',una:'1',dos:'2',tres:'3',cuatro:'4',cinco:'5',seis:'6'};
+function palabras(s){return Voz.norm(s).replace(/[^a-z0-9 ]/g,' ').split(/\s+/).map(w=>NUMP[w]||w).filter(w=>w.length>=3||/^\d+$/.test(w));}
+function puntaje(boton,dicho){const v=boton.dataset.v||boton.dataset.k||boton.dataset.o||'';const etiqueta=palabras(boton.textContent+' '+(SIN[v]||'')+' '+(boton.dataset.dia||'')+' '+(boton.dataset.fr||'')+' '+(boton.dataset.mo||''));
+ const dw=palabras(dicho);let n=0,pos=1e9;etiqueta.forEach(w=>{const i=dw.findIndex(x=>x===w||(w.length>=5&&x.startsWith(w.slice(0,5))));if(i>=0){n++;pos=Math.min(pos,i);}});return{n,pos};}
+function aplicarVoz(dicho){const r=$('resp');const txt=dicho.split(' | ')[0];
+ const inp=$('inp');if(inp){const numerico=inp.getAttribute('inputmode')==='numeric';inp.value=numerico?String(Voz.numero(dicho)||''):txt.replace(/^(me llamo|mi nombre es|soy|yo soy)\s+/i,'').replace(/^\w/,c=>c.toUpperCase());$('ok').click();return true;}
+ const rg=$('rg');if(rg){const n=Voz.numero(dicho);if(!n)return false;rg.value=Math.max(+rg.min,Math.min(+rg.max,n));rg.dispatchEvent(new Event('input'));setTimeout(()=>$('ok')&&$('ok').click(),900);return true;}
+ const tel=$('tel');if(tel){const d=txt.replace(/\D/g,'');if(d.length>=10){tel.value=d.slice(-10);decir('Sofía','Listo, anoté tu número. Solo marca la casilla de autorización y toca "Confirmar mi WhatsApp".','S');return true;}return false;}
+ const botones=[...r.querySelectorAll('button[data-v],button[data-k],button[data-o],button[data-dia],button[data-fr],button[data-mo]')];if(!botones.length){const ok=r.querySelector('button.prim,button[data-v="ok"]');if(ok&&/listo|sigamos|siguiente|bien|comparar|si/.test(Voz.norm(txt))){ok.click();return true;}return false;}
+ const multi=botones.some(b=>b.dataset.k||b.dataset.o),cita=botones.some(b=>b.dataset.dia);
+ if(cita){const dn=Voz.norm(txt);['dia','fr','mo'].forEach(k=>{const grupo=botones.filter(b=>b.dataset[k]);const m=grupo.map(b=>({b,...puntaje(b,dicho)})).filter(x=>x.n).sort((a,b)=>b.n-a.n)[0];if(m)m.b.click();});
+  if(r.querySelectorAll('.sel').length>=3){$('agendar').click();}else decir('Diego','Va, ya marqué lo que entendí. Completa lo que falte tocando el botón.','D');return true;}
+ const m=botones.map(b=>({b,...puntaje(b,dicho)})).filter(x=>x.n);if(!m.length)return false;
+ if(multi){m.sort((a,b)=>a.pos-b.pos).forEach(x=>{if(!x.b.classList.contains('sel'))x.b.click();});const ok=$('ok');if(ok&&!ok.disabled)setTimeout(()=>ok.click(),500);return true;}
+ m.sort((a,b)=>b.n-a.n||a.pos-b.pos)[0].b.click();return true;}
+function ponerMic(){const r=$('resp');if(!window.Voz||!Voz.activa()||!Voz.puedeOir||!r.innerHTML||r.querySelector('.mic'))return;
+ const m=document.createElement('div');m.className='mic';m.innerHTML='<button type="button" id="btnMic">🎙️ Responder hablando</button><small id="micTxt"></small>';r.appendChild(m);
+ $('btnMic').onclick=async()=>{const b=$('btnMic');b.classList.add('oye');b.textContent='👂 Te escucho…';$('micTxt').textContent='';
+  try{const dicho=await Voz.escuchar();b.classList.remove('oye');b.textContent='🎙️ Responder hablando';$('micTxt').textContent='Entendí: «'+dicho.split(' | ')[0]+'»';
+   if(!aplicarVoz(dicho))decir('Diego','Mmm… no te entendí bien. ¿Me lo repites o tocas una opción?','DP');}
+  catch(e){b.classList.remove('oye');b.textContent='🎙️ Responder hablando';$('micTxt').textContent=e.message==='not-allowed'?'Necesito permiso del micrófono para escucharte.':'No te escuché; inténtalo otra vez o toca una opción.';}};}
+new MutationObserver(()=>ponerMic()).observe(document.getElementById('resp'),{childList:true});
+function pintarBtnVoz(){const b=$('btnVoz');if(!b)return;const on=window.Voz&&Voz.activa();b.classList.toggle('on',!!on);b.textContent=on?'🔊 Voz activada':'🎙️ Platicar con voz';}
+document.addEventListener('DOMContentLoaded',()=>{});
+setTimeout(()=>{const b=$('btnVoz');if(!b)return;if(!window.Voz||(!Voz.puedeHablar&&!Voz.puedeOir)){b.hidden=true;return;}pintarBtnVoz();
+ b.onclick=()=>{const v=!Voz.activa();Voz.poner(v);pintarBtnVoz();if(v){if(!Voz.puedeOir)decir('Sofía','¡Va! Te voy a hablar. En este navegador no puedo escucharte, así que contesta tocando las opciones.','S');else{decir('Sofía','¡Va! Ahora te hablo y te escucho. Cuando quieras contestar, toca «Responder hablando». Tu voz la procesa tu navegador; no guardamos audios.','SC');}ponerMic();}else{$('resp').querySelector('.mic')&&$('resp').querySelector('.mic').remove();}};},0);
+
 // ---------- piezas de conversación ----------
 function decir(quien,html,pose){const d=document.createElement('div');const diego=quien==='Diego';d.className='msg'+(diego?' diego':'');
- d.innerHTML=`<img class="av" src="${AV[pose||(diego?'D':'S')]}" alt="${quien}" width="64" height="70"><div class="b"><span class="quien">${quien}</span>${html}</div>`;$('chat').appendChild(d);}
+ d.innerHTML=`<img class="av" src="${AV[pose||(diego?'D':'S')]}" alt="${quien}" width="64" height="70"><div class="b"><span class="quien">${quien}</span>${html}</div>`;$('chat').appendChild(d);ULT={quien,html};window.Voz&&Voz.decir(quien,html);}
 function yo(t){const d=document.createElement('div');d.className='msg yo';d.innerHTML=`<div class="b">${esc(t)}</div>`;$('chat').appendChild(d);}
 function dato(html){const d=document.createElement('div');d.className='dato';d.innerHTML=html;$('chat').appendChild(d);}
 function bajar(){requestAnimationFrame(()=>window.scrollTo({top:document.body.scrollHeight,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));}

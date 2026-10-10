@@ -174,5 +174,6 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boton); else boton();
   window.Juego = { sfx, logro, confeti, ganar, musica: (on) => { est.musica = on; guardar(); iniciar(); on ? arrancarMusica() : pararMusica(); },
-    energia: (v) => { energia = Math.max(0, Math.min(1, v)); }, otraCancion: () => { cambiar = true; }, estilo: () => estilo.n };
+    energia: (v) => { energia = Math.max(0, Math.min(1, v)); },
+    bajar: (on) => { if (ctx && musTimer) musBus.gain.setTargetAtTime(on ? VOL_MUS * .25 : VOL_MUS, ctx.currentTime, .15); }, otraCancion: () => { cambiar = true; }, estilo: () => estilo.n };
 })();

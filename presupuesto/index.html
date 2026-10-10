@@ -23,6 +23,7 @@
 <div class="bq-pista" id="bqPista"><img src="/assets/avatares/sofia-senala.svg" alt="" width="38">Toca un globito y te cuento de esa propiedad</div><div id="bqSel"></div></div></div>
 </section>
 <script src="/assets/vendor/leaflet/leaflet.js"></script>
+<script src="/js/juego.js"></script>
 <script>
 (function(){
 const LF=window.L;
@@ -65,8 +66,8 @@ function explica(p){const k=h(p.e),el=(o,i)=>o[(k>>>(i*3))%o.length],r0=ref[p.m+
 function tarjeta(p){const X=explica(p),adv=!X.ojo.startsWith('Nada raro'),q=adv?'DL':'SS',n=adv?'Diego':'Sofía',vb=adv?'te advierte':'te explica',u='/ficha.html?eb='+encodeURIComponent(p.e)+'&op='+(p.o==='V'?'VENTA':'RENTA');
  const meta=[p.c||p.m,p.r?p.r+' rec':'',sup(p)?sup(p)+' m²':''].filter(Boolean).join(' · ');
  return `<article class="pr-card"><a class="foto" href="${u}">${p.f?`<img src="${esc(p.f)}" alt="" loading="lazy">`:''}<span class="precio">${din(p.p)}${p.o==='R'?'/mes':''}</span></a><div class="cuerpo"><a class="tit" href="${u}" style="text-decoration:none">${esc(p.x)}</a><div class="meta">📍 ${esc(meta)}</div>${(x=>`<div class="dice"><img src="${AV[q]}" alt="" width="46" height="50"><div><b>${n} ${vb}</b><p>👍 <b>Lo bueno:</b> ${esc(x.bueno)}.</p><p>⚠️ <b>Ojo:</b> ${esc(x.ojo)}.</p><p>🎯 <b>Para:</b> ${esc(x.para)}.</p><p class="tip">💡 ${esc(x.tip)}</p></div></div>`)(X)}${p.a?`<button type="button" class="enmapa" data-e="${esc(p.e)}">📍 Ver en el mapa</button>`:''}<a class="ver" href="${u}">Ver ficha completa</a></div></article>`;}
-let marc={};
-function elegir(p){$('bqPista').style.display='none';document.querySelectorAll('.pin-precio.on').forEach(x=>x.classList.remove('on'));
+let marc={},tocado=false,ultSon=0;
+function elegir(p){window.Juego&&Juego.sfx('pop');$('bqPista').style.display='none';document.querySelectorAll('.pin-precio.on').forEach(x=>x.classList.remove('on'));
  const mk=marc[p.e];if(mk&&mk.getElement){const el=mk.getElement();const pin=el&&el.querySelector('.pin-precio');if(pin)pin.classList.add('on');}
  const X=explica(p),adv=!X.ojo.startsWith('Nada raro'),u='/ficha.html?eb='+encodeURIComponent(p.e)+'&op='+(p.o==='V'?'VENTA':'RENTA');
  $('bqSel').innerHTML=`<div class="bq-sel"><button type="button" class="cerrar" aria-label="Cerrar">×</button>${p.f?`<img src="${esc(p.f)}" alt="">`:'<img alt="">'}<div class="c"><b class="pr">${din(p.p)}${p.o==='R'?'/mes':''}</b>${esc(p.x)}<br><span style="color:#5b6575">${esc([p.c||p.m,p.r?p.r+' rec':'',sup(p)?sup(p)+' m²':''].filter(Boolean).join(' · '))}</span>
@@ -81,7 +82,7 @@ function pintar(){rango();
  const clave=p=>{const r0=ref[p.m+p.g+p.o],v=pm2(p),x=v&&r0?v/r0:1.5;return x>=.55?x:3+x};
  L.sort((a,b)=>clave(a)-clave(b)||b.p-a.p);
  const tipo={c:'casas',d:'depas',t:'terrenos'}[est.g],lugar=est.m||'toda la zona metropolitana';
- if(!L.length){$('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.DP}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Mmm… con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto o prueba otra zona, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
+ if(!L.length){if(tocado&&window.Juego&&Date.now()-ultSon>1500){ultSon=Date.now();Juego.sfx('lose');}$('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.DP}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Mmm… con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto o prueba otra zona, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
  const m=med(L.map(p=>p.p)),s=med(L.map(sup)),r=med(L.filter(p=>p.r).map(p=>p.r));
  const cols={};L.forEach(p=>{if(p.c)(cols[p.c]=cols[p.c]||[]).push(p)});
  const rinde=Object.entries(cols).filter(([,l])=>l.length>=3).map(([c,l])=>[c,med(l.map(sup))/med(l.map(p=>p.p))]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
@@ -93,11 +94,11 @@ function pintar(){rango();
   mk.on('click',()=>elegir(p));mk.addTo(capa);marc[p.e]=mk;pts.push([p.a,p.n]);});
  document.querySelectorAll('.enmapa').forEach(bt=>bt.onclick=()=>{const p=L.find(x=>x.e===bt.dataset.e);if(!p)return;tab('mapa');setTimeout(()=>{mapa.setView([p.a,p.n],15);elegir(p);},120);if(innerWidth>900)$('bqMapa').scrollIntoView({behavior:'smooth',block:'center'});});
  if(pts.length)mapa.fitBounds(pts,{padding:[30,30],maxZoom:14});
- history.replaceState(null,'','#'+new URLSearchParams({o:est.o,g:est.g,m:est.m,r:est.r,tope:est.tope}));}
-document.querySelectorAll('.bq-ops').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+ if(tocado&&window.Juego)Juego.logro('Explorador: encontraste opciones','🔎');history.replaceState(null,'','#'+new URLSearchParams({o:est.o,g:est.g,m:est.m,r:est.r,tope:est.tope}));}
+document.querySelectorAll('.bq-ops').forEach(g=>g.addEventListener('click',e=>{tocado=true;const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
  const c=g.dataset.campo;est[c]=c==='r'?+b.dataset.v:b.dataset.v;if(c==='o'||c==='g')est.tope=null;mostrar=24;pintar();}));
 document.querySelectorAll('.bq-tabs button').forEach(x=>x.onclick=()=>tab(x.dataset.tab));
-$('bqTope').addEventListener('input',e=>{est.tope=+e.target.value;mostrar=24;pintar();});
+$('bqTope').addEventListener('input',e=>{tocado=true;est.tope=+e.target.value;mostrar=24;pintar();});
 mapa=LF.map('bqMapa',{scrollWheelZoom:false}).setView([20.67,-103.38],11);
 LF.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap © CARTO'}).addTo(mapa);capa=LF.layerGroup().addTo(mapa);
 const q=new URLSearchParams(location.hash.slice(1));['o','g','m'].forEach(k=>{if(q.has(k))est[k]=q.get(k)});if(q.has('r'))est.r=+q.get('r');if(q.has('tope'))est.tope=+q.get('tope');

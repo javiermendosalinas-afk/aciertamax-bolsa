@@ -51,6 +51,7 @@ body{background:var(--papel);font-family:'Plus Jakarta Sans',system-ui,sans-seri
 <div id="resp"></div>
 <input class="hp" id="empresa" tabindex="-1" autocomplete="off" aria-hidden="true">
 </main>
+<script src="/js/juego.js"></script>
 <script>
 (function(){
 'use strict';
@@ -126,8 +127,8 @@ const PASOS=[
   const pintar=()=>{S.presupuesto=+$('rg').value;$('mt').textContent=din(S.presupuesto)+(renta?'/mes':'');cargarDatos().then(()=>{const l=coinciden(S.presupuesto);$('cuantas').textContent=l.length?`Hay ${l.length} opciones que encajan con lo que me has dicho.`:'Con esto aún no encuentro opciones; súbele tantito.';});};
   $('rg').oninput=pintar;pintar();$('ok').onclick=()=>{yo(din(S.presupuesto)+(renta?' al mes':''));r.innerHTML='';
    cargarDatos().then(()=>{const l=coinciden(S.presupuesto);const m=mediana(l.map(p=>p.p));
-    if(l.length){dato(`<b>${l.length} opciones</b><span>${S.tipo==='casa'?'casas':S.tipo==='departamento'?'depas':'terrenos'} en ${esc(S.municipio==='cualquiera'?'la zona metropolitana':S.municipio)} de hasta ${din(S.presupuesto)}${renta?'/mes':''}. La mitad cuesta menos de ${din(m)}.</span>`);}
-    else decir('Diego','Mmm… con ese presupuesto y esas características todavía no encuentro opciones. No pasa nada: tu asesor busca también fuera de nuestro inventario. Sigamos.','DP');sig();});};bajar();},
+    if(l.length){window.Juego&&Juego.logro(`Explorador: ${l.length} opciones para ti`,'🔎');dato(`<b>${l.length} opciones</b><span>${S.tipo==='casa'?'casas':S.tipo==='departamento'?'depas':'terrenos'} en ${esc(S.municipio==='cualquiera'?'la zona metropolitana':S.municipio)} de hasta ${din(S.presupuesto)}${renta?'/mes':''}. La mitad cuesta menos de ${din(m)}.</span>`);}
+    else{window.Juego&&Juego.sfx('lose');}if(!l.length)decir('Diego','Mmm… con ese presupuesto y esas características todavía no encuentro opciones. No pasa nada: tu asesor busca también fuera de nuestro inventario. Sigamos.','DP');sig();});};bajar();},
  ()=>{if(S.operacion==='renta')return sig(true);progreso(52,'Cómo pagarías');decir('Sofía','Ahora lo importante para que nadie te haga perder el tiempo: ¿cómo lo pagarías?','S');
   opciones([['banco','🏦 Crédito bancario'],['infonavit','🟥 Infonavit'],['cofinavit','🤝 Cofinavit'],['fovissste','🟩 Fovissste'],['contado','💵 De contado'],['nose','🤔 Aún no sé']],v=>{S.credito=v;sig();});},
  ()=>{if(S.operacion!=='renta'&&S.credito==='contado')return sig(true);progreso(58,'Tus ingresos');
@@ -149,6 +150,7 @@ const PASOS=[
   const r=P.alcance/pres;const v=r>=1?'cabe':r>=.85?'justo':'no alcanza';S.precalif.veredicto=v==='cabe'?'su presupuesto cabe':v==='justo'?'presupuesto justo':'presupuesto arriba de su capacidad';
   dato(`<b>Te alcanza hasta ${din(P.alcance)}</b><span>${S.credito==='contado'?'con tus recursos, ya descontando gastos de escrituración':`con una mensualidad de hasta ${din(P.mensualidad)} y un crédito de unos ${din(P.credito)}, más tu enganche`}.</span>
    <div class="medidor"><i style="width:${Math.min(100,r*100)}%;background:${v==='cabe'?'#3DBE7A':v==='justo'?'#F5A04A':'#E5484D'}"></i></div><span>Tu presupuesto: ${din(pres)}</span>`);
+  if(window.Juego){if(v==='cabe')Juego.ganar('¡Te alcanza!','💰');else if(v==='justo')Juego.sfx('coin');else Juego.sfx('lose');}
   if(v==='cabe')decir('Sofía','¡Va que va! Tu presupuesto cabe en lo que te pueden prestar. Eso te pone en muy buena posición para negociar.','SC');
   else if(v==='justo')decir('Diego','Ojo, ahí te va un tip: estás justo. Con un poco más de enganche, o sumando el ingreso de tu pareja, quedas holgado. Y nunca te comprometas a una mensualidad que te deje sin colchón.','DL');
   else{const alt=cargarDatos().then(()=>{});decir('Diego',`Ojo: con estos números te alcanzaría hasta ${din(P.alcance)}, menos que tu presupuesto. Opciones reales: subir el enganche, <strong>Cofinavit</strong> si cotizas en Infonavit, sumar el ingreso de tu pareja, o buscar donde rinde más el m². Tu asesor te ayuda a armar la mejor combinación.`,'DL');}
@@ -156,13 +158,13 @@ const PASOS=[
  ()=>{progreso(82,'Tiempos');decir('Diego','¿Para cuándo te gustaría estar ya en tu nuevo lugar?','D');
   opciones([['ya','⚡ Lo antes posible'],['1a3','📆 En 1 a 3 meses'],['mas3','🔭 Más adelante, estoy explorando']],v=>{S.cuando=v;sig();});},
  ()=>{decir('Sofía','Y la decisión final, ¿la tomas tú o con alguien más? Así invitamos a quien deba estar en la visita.','S');
-  opciones([['solo','🙋 Yo solo(a)'],['pareja','💑 Con mi pareja'],['familia','👨‍👩‍👧 Con mi familia'],['socio','🤝 Con socio(s)']],v=>{S.decide=v;sig();});},
+  opciones([['solo','🙋 Yo solo(a)'],['pareja','💑 Con mi pareja'],['familia','👨‍👩‍👧 Con mi familia'],['socio','🤝 Con socio(s)']],v=>{S.decide=v;window.Juego&&Juego.logro('¡Perfil completo!','📋');sig();});},
  ()=>{progreso(87,'Tus favoritas');cargarDatos().then(()=>{const tope=Math.min(S.presupuesto,(S.precalif&&S.precalif.alcance)||S.presupuesto)*1.05;
   const l=coinciden(tope).sort((a,b)=>(a.p/(a.s||a.t||1))-(b.p/(b.s||b.t||1))).filter(p=>(p.s||p.t)).slice(0,6);
   if(!l.length){decir('Diego','Con todo lo que me dijiste no hay opciones publicadas ahorita, pero tu asesor tiene más inventario y alertas de lo nuevo. Vamos a agendarte.','DP');return sig(true);}
   decir('Sofía',`¡Mira! Estas son las que mejor encajan contigo${S.precalif&&S.precalif.alcance&&S.precalif.alcance<S.presupuesto?', dentro de lo que te alcanza':''}, de las que más rinden. Marca con ♥ las que te gustaría ver; se las paso a quien te va a atender.`,'SS');
   const box=document.createElement('div');box.className='props';box.innerHTML=l.map(p=>`<div class="prop">${p.f?`<img src="${esc(p.f)}" alt="" loading="lazy">`:'<img alt="">'}<button type="button" class="fav ${S.favoritas.includes(p.e)?'on':''}" data-e="${esc(p.e)}" aria-label="Marcar como favorita">♥</button><div class="t"><b>${din(p.p)}${p.o==='R'?'/mes':''}</b>${esc(p.x)}<br>${esc(p.c||p.m)}${p.r?` · ${p.r} rec`:''}<br><a href="/ficha.html?eb=${encodeURIComponent(p.e)}&op=${p.o==='V'?'VENTA':'RENTA'}" target="_blank" rel="noopener">Ver ficha</a></div></div>`).join('');
-  $('chat').appendChild(box);box.querySelectorAll('.fav').forEach(b=>b.onclick=()=>{b.classList.toggle('on');const e=b.dataset.e;S.favoritas=b.classList.contains('on')?[...new Set([...S.favoritas,e])]:S.favoritas.filter(x=>x!==e);guardar();});
+  $('chat').appendChild(box);box.querySelectorAll('.fav').forEach(b=>b.onclick=()=>{b.classList.toggle('on');const e=b.dataset.e;if(b.classList.contains('on'))window.Juego&&Juego.logro('Primera favorita','♥');S.favoritas=b.classList.contains('on')?[...new Set([...S.favoritas,e])]:S.favoritas.filter(x=>x!==e);guardar();});
   opciones([['ok','Listo, sigamos']],()=>sig());});},
  ()=>{progreso(91,'Tu WhatsApp');decir('Sofía','Ya casi. ¿A qué WhatsApp te escribe tu asesor? Te mandamos un mensajito para confirmar que es tuyo.','S');
   const r=$('resp');r.className='resp';r.innerHTML=`<input type="tel" id="tel" placeholder="33 1234 5678" inputmode="tel" value="${esc(S.whatsapp||'')}"><input type="email" id="mail" placeholder="Correo (opcional)" value="${esc(S.email||'')}">
@@ -189,7 +191,7 @@ const PASOS=[
     recamaras:String(S.recamaras||''),verifica:true,notas:(S.colonia?'Referencia: '+S.colonia:''),enganche:num(S.enganche),empleo:S.empleo||'',decide:S.decide||'',para_quien:S.uso==='invertir'?'inversion':(S.para_quien||''),
     precalif_infonavit:num(S.precalif_infonavit),imprescindibles:S.imprescindibles,favoritas:S.favoritas,precalif:S.precalif||{},cita});
    if(!res.ok){$('agendar').disabled=false;$('agendar').textContent='Agendar mi cita';$('err').textContent=(res.j&&res.j.error)||'No pudimos agendar. Intenta de nuevo o escríbenos por WhatsApp.';return;}
-   yo(`${cita.dia}, ${cita.franja}, por ${cita.modo}`);r.innerHTML='';S.terminado=true;guardar();sig();};bajar();},
+   yo(`${cita.dia}, ${cita.franja}, por ${cita.modo}`);r.innerHTML='';S.terminado=true;guardar();window.Juego&&Juego.ganar('¡Cita agendada!','🏆');sig();};bajar();},
  ()=>{progreso(100,'¡Listo!');const v=(S.vendedor||'').split(' ')[0];
   decir('Sofía',`¡Va! 🎉 Le pasamos todo tu perfil a ${v?`<strong>${esc(v)}</strong>, de Acierta Max`:'un asesor de Acierta Max'}. Te va a escribir por WhatsApp para confirmar tu cita. Ya te llegó un mensaje de confirmación.`,'SC');
   const c=document.createElement('div');c.className='resumen';const tipo={casa:'Casa',departamento:'Depa',terreno:'Terreno'}[S.tipo];
@@ -200,7 +202,7 @@ const PASOS=[
 async function post(ruta,datos){try{const r=await fetch(CFG.endpoint+ruta,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)});const j=await r.json().catch(()=>({}));return{ok:r.ok&&j.ok!==false,j};}catch(e){return{ok:false,j:{error:'No pudimos conectar. Revisa tu internet.'}};}}
 async function registrar(){if(S.folio&&S.token){return sig();}
  const res=await post('',{nombre:S.nombre,whatsapp:S.whatsapp,email:S.email||'',consentimiento:true,aviso_version:CFG.avisoVersion,operacion:S.operacion,tipo:S.tipo,uso:S.uso||'',cuando:S.cuando||'',municipio:S.municipio||'cualquiera',colonia:S.colonia||'',empresa:$('empresa').value});
- if(res.ok&&res.j.folio){S.folio=res.j.folio;S.token=res.j.token;S.vendedor=res.j.vendedor||'';guardar();$('resp').innerHTML='';sig();}
+ if(res.ok&&res.j.folio){window.Juego&&Juego.logro('WhatsApp confirmado','✅');S.folio=res.j.folio;S.token=res.j.token;S.vendedor=res.j.vendedor||'';guardar();$('resp').innerHTML='';sig();}
  else{const e=$('err');if(e)e.textContent=(res.j&&res.j.error)||'No pudimos guardar tus datos. Escríbenos por WhatsApp al 33 3377 7337.';const b=$('ver');if(b){b.disabled=false;b.textContent='Confirmar mi WhatsApp';}}}
 function sig(){paso++;guardar();setTimeout(()=>{PASOS[paso]&&PASOS[paso]();bajar();},350);}
 // arranque (si ya terminó antes, empieza de nuevo; si dejó a medias, empieza desde el principio con sus datos ya llenos)

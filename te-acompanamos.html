@@ -324,6 +324,10 @@ const PASOS=[
   opciones([['solo','🙋 Yo solo(a)'],['pareja','💑 Con mi pareja'],['familia','👨‍👩‍👧 Con mi familia'],['socio','🤝 Con socio(s)']],v=>{S.decide=v;window.Juego&&Juego.logro('¡Perfil completo!','📋');sig();});},
  ()=>{progreso(86,'Tus 3 para visitar');cargarDatos().then(async()=>{const o=S.operacion==='renta'?'R':'V',g=grupo[S.tipo];let cand=(DATA||[]).filter(p=>p.o===o&&p.g===g&&p.p<=techo()&&(g==='t'||!S.recamaras||p.r>=S.recamaras)&&enZona(p)&&(p.s||p.t));
   if(cand.length<6&&S.zona){S.zona.r+=3;cand=(DATA||[]).filter(p=>p.o===o&&p.g===g&&p.p<=techo()&&(g==='t'||!S.recamaras||p.r>=S.recamaras)&&enZona(p)&&(p.s||p.t));}
+  const reqK=(S.imprescindibles.includes('Acepta mascotas')?'M':'')+(S.imprescindibles.includes('Jardín o patio')?'J':'');
+  if(reqK){const conK=cand.filter(p=>[...reqK].every(c=>(p.k||'').includes(c)));
+   if(conK.length>=3)cand=conK;else{const etiqueta=reqK.includes('M')?'acepten mascotas':'tengan jardín';decir('Diego',conK.length?`Ojo: solo ${conK.length} de tu zona y presupuesto dicen que ${etiqueta}; te las pongo primero y te dejo otras cercanas. En la visita confírmalo con el dueño.`:`Ojo: en tu zona y presupuesto ninguna dice que ${etiqueta}. Te muestro las que mejor te quedan; muchas sí lo aceptan aunque no lo publiquen, y tu asesor lo confirma.`,'DL');
+    cand=[...conK,...cand.filter(p=>!conK.includes(p))];}}
   if(FAV){const f=(DATA||[]).find(x=>x.e===FAV);if(f&&!cand.includes(f))cand.unshift(f);}
   await detalles(cand.slice(0,60));const ctx=contexto(cand);const cal=new Map(cand.slice(0,60).map(p=>[p.e,calificar(p,ctx)]));
   const top=cand.slice(0,60).sort((a,b)=>cal.get(b.e).total-cal.get(a.e).total).slice(0,8);if(FAV&&!top.some(p=>p.e===FAV)){const f=cand.find(p=>p.e===FAV);if(f)top.unshift(f);}

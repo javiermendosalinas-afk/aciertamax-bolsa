@@ -144,6 +144,38 @@ def explicacion(p, ref_pm2):
             "para": para[0].upper() + para[1:], "consejo": consejo}
 
 
+def marcas_neojaus():
+    """Marcas por propiedad desde las fichas de NeoJaus (acierta-pro-web): M mascotas, F amueblado, A alberca, J jardín, S seguridad."""
+    import urllib.request
+    local = os.environ.get("FICHAS_NJ_DIR", "")
+    base = "https://raw.githubusercontent.com/javiermendosalinas-afk/acierta-pro-web/main/herramientas/neojaus/fichas/"
+    SI = re.compile(r"mascota|pet ?friendly|pets? allowed", re.I)
+    NO = re.compile(r"no (se )?(aceptan|permiten|admiten) mascotas|sin mascotas|no mascotas|no pets", re.I)
+    marcas = {}
+    claves = [a + b for a in "0123456789abcdefghijklmnopqrstuvwxyz" for b in "0123456789abcdefghijklmnopqrstuvwxyz"]
+    for k in claves:
+        try:
+            if local and os.path.exists(os.path.join(local, k + ".json")):
+                d = json.load(open(os.path.join(local, k + ".json"), encoding="utf-8"))
+            elif local:
+                continue
+            else:
+                with urllib.request.urlopen(base + k + ".json", timeout=15) as r:
+                    d = json.loads(r.read().decode("utf-8"))
+        except Exception:
+            continue
+        for eb, v in d.items():
+            a = " ".join(str(x).lower() for x in v.get("amenidades", [])); desc = v.get("descripcion", "")
+            m = ""
+            if not NO.search(desc) and ("pet" in a or "mascota" in a or SI.search(desc)): m += "M"
+            if "amueblad" in a or re.search(r"\bamueblad[oa]\b", desc, re.I): m += "F"
+            if "pool" in a or "alberca" in a: m += "A"
+            if "garden" in a or "private_patio" in a or "jard" in a: m += "J"
+            if "security" in a or "controlled_access" in a or "vigilancia" in a: m += "S"
+            if m: marcas[eb] = m
+    return marcas
+
+
 def cargar():
     data = json.load(open(os.path.join(RAIZ, "data.json"), encoding="utf-8"))
     out = []
@@ -228,6 +260,7 @@ BUSCADOR = '''<link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
 <div class="bq-paso"><span>2</span>¿Qué buscas?</div><div class="bq-ops" data-campo="g"><button data-v="c" class="on"><span class="ico">🏡</span>Casa</button><button data-v="d"><span class="ico">🏢</span>Depa</button><button data-v="t"><span class="ico">🌳</span>Terreno</button></div>
 <div class="bq-paso"><span>3</span>¿Por dónde?</div><div class="bq-ops" data-campo="m"><button data-v="" class="on">📍 Donde sea</button><button data-v="Zapopan">Zapopan</button><button data-v="Guadalajara">Guadalajara</button><button data-v="Tlaquepaque">Tlaquepaque</button><button data-v="Tonalá">Tonalá</button><button data-v="Tlajomulco de Zúñiga">Tlajomulco</button></div>
 <div class="bq-paso"><span>4</span>¿Cuánto tienes?</div><div class="bq-rango"><input type="range" id="bqTope" aria-label="Presupuesto máximo"><b id="bqTopeTxt"></b></div>
+<div class="bq-paso"><span>✨</span>¿Algo indispensable? <small style="color:#5b6575;font-weight:600">(opcional)</small></div><div class="bq-ops" id="bqExtras"><button data-k="M">🐾 Acepta mascotas</button><button data-k="F">🛋️ Amueblado</button><button data-k="A">🏊 Con alberca</button><button data-k="J">🌳 Con jardín</button></div>
 <div class="bq-paso" id="bqRecPaso"><span>5</span>¿Cuántas recámaras?</div><div class="bq-ops" data-campo="r" id="bqRec"><button data-v="0" class="on">Me da igual</button><button data-v="1">1 o más</button><button data-v="2">2 o más</button><button data-v="3">3 o más</button></div>
 <div id="bqResumen"></div>
 <div class="bq-tabs" role="tablist"><button type="button" class="on" data-tab="lista">📋 Lista</button><button type="button" data-tab="mapa">🗺️ Mapa</button></div>
@@ -247,7 +280,7 @@ const ZONA={'Zapopan':'Zapopan es el que más oferta tiene. Por Valle Real, Puer
  'Tlajomulco de Zúñiga':'En Tlajomulco hay fraccionamientos nuevos con buen precio por m². Antes de decidir, calcula tus traslados en hora pico por López Mateos o la carretera a Chapala.',
  '':'En toda la zona metropolitana hay de todo. Si tienes una zona en mente, elígela arriba y afino la búsqueda.'};
 const RANGO={'Vc':[1e6,15e6,25e4,4e6],'Vd':[1e6,10e6,25e4,3e6],'Vt':[3e5,1e7,1e5,2e6],'Rc':[5e3,8e4,1e3,2e4],'Rd':[4e3,5e4,1e3,15e3],'Rt':[5e3,1e5,1e3,2e4]};
-let D=[],ref={},est={o:'V',g:'c',m:'',r:0,tope:null},mapa,capa;
+let D=[],ref={},est={o:'V',g:'c',m:'',r:0,tope:null,k:''},mapa,capa;
 const $=id=>document.getElementById(id), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const din=v=>'$'+Math.round(v).toLocaleString('es-MX'), corto=v=>v>=1e6?'$'+(v/1e6).toFixed(v>=1e7?0:1).replace('.0','')+'M':'$'+Math.round(v/1e3)+'k';
 const sup=p=>p.g==='t'?p.t:(p.s||0), pm2=p=>sup(p)>0?p.p/sup(p):null;
@@ -276,7 +309,7 @@ function explica(p){const k=h(p.e),el=(o,i)=>o[(k>>>(i*3))%o.length],r0=ref[p.m+
  else{const r=.1013/12,n=240,m=p.p*.8*r/(1-Math.pow(1+r,-n));tip=`Con 20% de enganche (${din(p.p*.2)}), la mensualidad rondaría ${din(m)} a 20 años; te pedirían ingresos de unos ${din(m/.3)} al mes. Y antes de firmar, pide una revisión.`;}
  return{bueno:bueno.slice(0,2).join('; ')||'Vale la pena verla en persona',ojo:ojo.slice(0,2).join('; ')||'Nada raro en los datos; confírmalo en la visita',para,tip};}
 function tarjeta(p){const X=explica(p),adv=!X.ojo.startsWith('Nada raro'),q=adv?'DL':'SS',n=adv?'Diego':'Sofía',vb=adv?'te advierte':'te explica',u='/ficha.html?eb='+encodeURIComponent(p.e)+'&op='+(p.o==='V'?'VENTA':'RENTA');
- const meta=[p.c||p.m,p.r?p.r+' rec':'',sup(p)?sup(p)+' m²':''].filter(Boolean).join(' · ');
+ const meta=[p.c||p.m,p.r?p.r+' rec':'',sup(p)?sup(p)+' m²':'',(p.k||'').includes('M')?'🐾':'',(p.k||'').includes('F')?'🛋️':''].filter(Boolean).join(' · ');
  return `<article class="pr-card"><a class="foto" href="${u}">${p.f?`<img src="${esc(p.f)}" alt="" loading="lazy">`:''}<span class="precio">${din(p.p)}${p.o==='R'?'/mes':''}</span></a><div class="cuerpo"><a class="tit" href="${u}" style="text-decoration:none">${esc(p.x)}</a><div class="meta">📍 ${esc(meta)}</div>${(x=>`<div class="dice"><img src="${AV[q]}" alt="" width="46" height="50"><div><b>${n} ${vb}</b><p>👍 <b>Lo bueno:</b> ${esc(x.bueno)}.</p><p>⚠️ <b>Ojo:</b> ${esc(x.ojo)}.</p><p>🎯 <b>Para:</b> ${esc(x.para)}.</p><p class="tip">💡 ${esc(x.tip)}</p></div></div>`)(X)}${p.a?`<button type="button" class="enmapa" data-e="${esc(p.e)}">📍 Ver en el mapa</button>`:''}<a class="ver" href="${u}">Ver ficha completa</a></div></article>`;}
 let marc={},tocado=false,ultSon=0;
 function elegir(p){window.Juego&&Juego.sfx('pop');$('bqPista').style.display='none';document.querySelectorAll('.pin-precio.on').forEach(x=>x.classList.remove('on'));
@@ -291,15 +324,15 @@ function rango(){const r=RANGO[est.o+est.g],s=$('bqTope');s.min=r[0];s.max=r[1];
  $('bqTopeTxt').textContent='Hasta '+din(est.tope)+(est.o==='R'?' al mes':'');$('bqRecPaso').style.display=$('bqRec').style.display=est.g==='t'?'none':'';}
 let mostrar=24;
 function pintar(){rango();
- const L=D.filter(p=>p.o===est.o&&p.g===est.g&&(!est.m||p.m===est.m)&&p.p<=est.tope&&(est.g==='t'||p.r>=est.r));
+ const L=D.filter(p=>p.o===est.o&&p.g===est.g&&(!est.m||p.m===est.m)&&p.p<=est.tope&&(est.g==='t'||p.r>=est.r)&&[...(est.k||'')].every(c=>(p.k||'').includes(c)));
  const clave=p=>{const r0=ref[p.m+p.g+p.o],v=pm2(p),x=v&&r0?v/r0:1.5;return x>=.55?x:3+x};
  L.sort((a,b)=>clave(a)-clave(b)||b.p-a.p);
  const tipo={c:'casas',d:'depas',t:'terrenos'}[est.g],lugar=est.m||'toda la zona metropolitana';
- if(!L.length){if(tocado&&window.Juego&&Date.now()-ultSon>1500){ultSon=Date.now();Juego.sfx('lose');}$('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.DP}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Mmm… con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto o prueba otra zona, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
+ if(!L.length){if(tocado&&window.Juego&&Date.now()-ultSon>1500){ultSon=Date.now();Juego.sfx('lose');}$('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.DP}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Mmm… con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto, prueba otra zona${est.k?' o quita algún indispensable':''}, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
  const m=med(L.map(p=>p.p)),s=med(L.map(sup)),r=med(L.filter(p=>p.r).map(p=>p.r));
  const cols={};L.forEach(p=>{if(p.c)(cols[p.c]=cols[p.c]||[]).push(p)});
  const rinde=Object.entries(cols).filter(([,l])=>l.length>=3).map(([c,l])=>[c,med(l.map(sup))/med(l.map(p=>p.p))]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
- $('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.SC}" alt="" width="104" height="113"><figcaption>Sofía</figcaption></figure><div class="txt"><b class="n">SOFÍA DICE</b>¡Va! Encontré <b>${L.length} ${tipo}</b> para ${est.o==='V'?'comprar':'rentar'} en ${esc(lugar)} de hasta ${din(est.tope)}${est.o==='R'?' al mes':''}. La mitad cuesta menos de <b>${din(m)}</b>${s?` y lo típico son <b>${Math.round(s)} m²</b>`:''}${r&&est.g!=='t'?` con <b>${r} recámaras</b>`:''}.${rinde.length?` Donde más rinde tu lana: <b>${rinde.map(esc).join(', ')}</b>.`:''}</div></div>
+ $('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.SC}" alt="" width="104" height="113"><figcaption>Sofía</figcaption></figure><div class="txt"><b class="n">SOFÍA DICE</b>¡Va! Encontré <b>${L.length} ${tipo}</b>${(est.k||'').includes('M')?' que aceptan mascotas 🐾':''}${(est.k||'').includes('F')?' amuebladas':''} para ${est.o==='V'?'comprar':'rentar'} en ${esc(lugar)} de hasta ${din(est.tope)}${est.o==='R'?' al mes':''}. La mitad cuesta menos de <b>${din(m)}</b>${s?` y lo típico son <b>${Math.round(s)} m²</b>`:''}${r&&est.g!=='t'?` con <b>${r} recámaras</b>`:''}.${rinde.length?` Donde más rinde tu lana: <b>${rinde.map(esc).join(', ')}</b>.`:''}</div></div>
  <div class="pr-burbuja der"><figure><img src="${AV.D}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Ojo, ahí te va un tip: ${esc(ZONA[est.m])} Te las puse de las que más rinden a las que menos. ¿Quieres saber cuánto te prestan y que un asesor te acompañe? <a href="/te-acompanamos.html" style="color:#E07812;font-weight:800">Platica con nosotros</a>.</div></div>`;
  $('bqLista').innerHTML=L.slice(0,mostrar).map(tarjeta).join('')+(L.length>mostrar?`<div class="bq-mas"><button class="pr-cta" id="bqMas" style="border:0;cursor:pointer">Ver ${Math.min(24,L.length-mostrar)} más</button></div>`:'');
  const b=$('bqMas');if(b)b.onclick=()=>{mostrar+=24;pintar()};
@@ -309,15 +342,16 @@ function pintar(){rango();
  const q=(arr,f)=>{const s=arr.slice().sort((x,y)=>x-y);return s[Math.min(s.length-1,Math.max(0,Math.floor(f*(s.length-1))))];};
  const la=pts.map(x=>x[0]),ln=pts.map(x=>x[1]),cerca=pts.length>8?pts.filter(x=>x[0]>=q(la,.08)&&x[0]<=q(la,.92)&&x[1]>=q(ln,.08)&&x[1]<=q(ln,.92)):pts;
  ultPts=cerca.length?cerca:pts;mapa.invalidateSize();if(ultPts.length)mapa.fitBounds(ultPts,{padding:[30,30],maxZoom:14});
- if(tocado&&window.Juego)Juego.logro('Explorador: encontraste opciones','🔎');history.replaceState(null,'','#'+new URLSearchParams(Object.assign({o:est.o,g:est.g,m:est.m,r:est.r,tope:est.tope},$('bqRes').classList.contains('ver-mapa')?{vista:'mapa'}:{})));}
-document.querySelectorAll('.bq-ops').forEach(g=>g.addEventListener('click',e=>{tocado=true;const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+ if(tocado&&window.Juego)Juego.logro('Explorador: encontraste opciones','🔎');history.replaceState(null,'','#'+new URLSearchParams(Object.assign({o:est.o,g:est.g,m:est.m,r:est.r,tope:est.tope},est.k?{k:est.k}:{},$('bqRes').classList.contains('ver-mapa')?{vista:'mapa'}:{})));}
+document.querySelectorAll('.bq-ops').forEach(g=>g.addEventListener('click',e=>{if(!g.dataset.campo)return;tocado=true;const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
  const c=g.dataset.campo;est[c]=c==='r'?+b.dataset.v:b.dataset.v;if(c==='o'||c==='g')est.tope=null;mostrar=24;pintar();}));
 document.querySelectorAll('.bq-tabs button').forEach(x=>x.onclick=()=>tab(x.dataset.tab));
+document.querySelectorAll('#bqExtras button').forEach(x=>{x.classList.toggle('on',(est.k||'').includes(x.dataset.k));x.onclick=()=>{tocado=true;const c=x.dataset.k;est.k=(est.k||'').includes(c)?est.k.replace(c,''):(est.k||'')+c;x.classList.toggle('on');mostrar=24;pintar();};});
 $('bqTope').addEventListener('input',e=>{tocado=true;est.tope=+e.target.value;mostrar=24;pintar();});
 mapa=LF.map('bqMapa',{scrollWheelZoom:false}).setView([20.67,-103.38],11);
 LF.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapa);capa=LF.layerGroup().addTo(mapa);
-const q=new URLSearchParams(location.hash.slice(1));const verMapa=q.get('vista')==='mapa';['o','g','m'].forEach(k=>{if(q.has(k))est[k]=q.get(k)});if(q.has('r'))est.r=+q.get('r');if(q.has('tope'))est.tope=+q.get('tope');
-document.querySelectorAll('.bq-ops').forEach(g=>{const c=g.dataset.campo;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',String(b.dataset.v)===String(est[c])))});
+const q=new URLSearchParams(location.hash.slice(1));const verMapa=q.get('vista')==='mapa';['o','g','m','k'].forEach(k=>{if(q.has(k))est[k]=q.get(k)});document.querySelectorAll('#bqExtras button').forEach(x=>x.classList.toggle('on',(est.k||'').includes(x.dataset.k)));if(q.has('r'))est.r=+q.get('r');if(q.has('tope'))est.tope=+q.get('tope');
+document.querySelectorAll('.bq-ops').forEach(g=>{const c=g.dataset.campo;if(!c)return;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',String(b.dataset.v)===String(est[c])))});
 fetch('/presupuesto/buscador.json').then(r=>r.json()).then(j=>{D=j;if(verMapa){tab('mapa');setTimeout(()=>{document.getElementById('bqMapa').scrollIntoView({block:'center'});},300);}const gr={};D.forEach(p=>{const v=pm2(p);if(v)(gr[p.m+p.g+p.o]=gr[p.m+p.g+p.o]||[]).push(v)});for(const k in gr)ref[k]=med(gr[k]);pintar();});
 })();
 </script>'''
@@ -471,7 +505,9 @@ def main():
     os.makedirs(os.path.join(RAIZ, "presupuesto"), exist_ok=True)
     open(os.path.join(RAIZ, "presupuesto", "index.html"), "w", encoding="utf-8").write(h + PIE)
     urls.insert(0, "/presupuesto/")
-    ligero = [{"e": p["eb"], "o": p["operacion"][0], "g": p["grupo"][0], "m": p["municipio"], "c": p["colonia"], "p": round(p["precio"]),
+    marcas = marcas_neojaus()
+    print(f"Marcas de NeoJaus: {len(marcas):,} propiedades (mascotas: {sum(1 for v in marcas.values() if 'M' in v):,})", flush=True)
+    ligero = [{"e": p["eb"], "k": marcas.get(p["eb"], ""), "o": p["operacion"][0], "g": p["grupo"][0], "m": p["municipio"], "c": p["colonia"], "p": round(p["precio"]),
                "r": int(p["recamaras"]) if p.get("recamaras") else 0, "s": round(p.get("construccion") or p.get("m2") or 0),
                "t": round(p.get("terreno") or 0), "f": p.get("foto") or "", "a": round(p["lat"], 5) if p.get("lat") else None,
                "n": round(p["lon"], 5) if p.get("lon") else None, "x": p["titulo"].split(" | ")[0][:90]} for p in props]

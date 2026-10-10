@@ -34,6 +34,11 @@
 .pq form{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #E3E7EF}
 .pq input{flex:1;font:inherit;padding:11px 14px;border:2px solid #DCE1EA;border-radius:999px}.pq input:focus{outline:3px solid #F5A04A;outline-offset:1px}
 .pq form button{border:0;border-radius:999px;padding:0 16px;font:inherit;font-weight:800;cursor:pointer;background:#E07812;color:#fff}.pq form .mic{background:#13233A}
+.pq .res{margin:6px 0 4px 50px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pq .res a{background:#fff;border-radius:14px;overflow:hidden;text-decoration:none;color:#13233A;box-shadow:0 2px 6px rgba(19,35,58,.1);font-size:.82rem}
+.pq .res img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#13233A}.pq .res div{padding:6px 8px}.pq .res b{color:#E07812;display:block;font-size:.95rem}
+.pq .mapa-btn{display:block;margin:6px 0 4px 50px;background:#13233A;color:#fff;border-radius:999px;padding:10px 14px;text-align:center;font-weight:800;text-decoration:none}
+.pq .alt{margin:4px 0 0 50px;display:flex;flex-wrap:wrap;gap:6px}.pq .alt button{border:2px solid #E07812;background:#FFF6EC;border-radius:999px;padding:7px 11px;font:inherit;font-weight:700;font-size:.82rem;color:#13233A;cursor:pointer}
 .pq .escribe{color:#5b6575;font-size:.85rem;margin:6px 0 0 50px}
 @media(max-width:560px){.pq-fab{padding:4px}.pq-fab span{display:none}}`;
   document.head.appendChild(css);
@@ -47,6 +52,37 @@
       const a = document.createElement('div'); a.className = 'acc';
       a.innerHTML = acciones.map(k => ACC[k] ? (k === 'recorrido' && enRecorrido ? `<button type="button" data-cerrar="1">🧭 Seguir con mi búsqueda</button>` : `<a href="${ACC[k].u}" ${/^https?:/.test(ACC[k].u) && !/inmobiliaria\.pro/.test(ACC[k].u) ? 'target="_blank" rel="noopener"' : ''}>${ACC[k].t}</a>`) : '').join('');
       lista.appendChild(a); a.querySelectorAll('[data-cerrar]').forEach(b => b.onclick = cerrar);
+    }
+    lista.scrollTop = lista.scrollHeight;
+  }
+  let DATOS = null;
+  const cargarDatos = () => DATOS ? Promise.resolve(DATOS) : fetch('/presupuesto/buscador.json').then(r => r.json()).then(j => DATOS = j).catch(() => DATOS = []);
+  const din = v => '$' + Math.round(v || 0).toLocaleString('es-MX');
+  function filtrar(b) { return (DATOS || []).filter(p => p.o === b.o && p.g === b.g && (!b.m || p.m === b.m) && (!b.tope || p.p <= b.tope) && (b.g === 't' || !b.rec || p.r >= b.rec) && [...(b.k || '')].every(c => (p.k || '').includes(c))); }
+  function urlMapa(b) { return '/presupuesto/#' + new URLSearchParams(Object.assign({ o: b.o, g: b.g, m: b.m || '', r: b.rec || 0, tope: b.tope || (b.o === 'R' ? 20000 : 4000000), vista: 'mapa' }, b.k ? { k: b.k } : {})); }
+  async function mostrarBusqueda(lista, b) {
+    await cargarDatos(); const L = filtrar(b).sort((x, y) => x.p - y.p);
+    const tipo = { c: 'casas', d: 'depas', t: 'terrenos' }[b.g] || 'opciones';
+    if (L.length) {
+      const r = document.createElement('div'); r.className = 'res';
+      r.innerHTML = L.slice(0, 4).map(p => `<a href="/ficha.html?eb=${encodeURIComponent(p.e)}&op=${p.o === 'V' ? 'VENTA' : 'RENTA'}">${p.f ? `<img src="${esc(p.f)}" alt="" loading="lazy">` : '<img alt="">'}<div><b>${din(p.p)}${p.o === 'R' ? '/mes' : ''}</b>${esc(p.c || p.m)}${p.r ? ` · ${p.r} rec` : ''}${(p.k || '').includes('M') ? ' · 🐾' : ''}${(p.k || '').includes('F') ? ' · 🛋️' : ''}</div></a>`).join('');
+      lista.appendChild(r);
+    }
+    const m = document.createElement('a'); m.className = 'mapa-btn'; m.href = urlMapa(b);
+    m.textContent = L.length ? `🗺️ Ver las ${L.length} ${tipo} en el mapa` : '🗺️ Abrir el mapa con esta búsqueda'; lista.appendChild(m);
+    if (L.length < 5) {
+      const alts = [];
+      if (b.tope) { const b2 = Object.assign({}, b, { tope: Math.round(b.tope * 1.15 / 500) * 500 }); alts.push([`Hasta ${din(b2.tope)} (${filtrar(b2).length})`, b2]); }
+      if (b.g === 'd') { const b2 = Object.assign({}, b, { g: 'c' }); alts.push([`También casas (${filtrar(b2).length})`, b2]); }
+      if (b.m) { const b2 = Object.assign({}, b, { m: '' }); alts.push([`En toda la ZMG (${filtrar(b2).length})`, b2]); }
+      if (b.k) { const b2 = Object.assign({}, b, { k: '' }); alts.push([`Sin indispensables (${filtrar(b2).length})`, b2]); }
+      if (b.rec > 1) { const b2 = Object.assign({}, b, { rec: b.rec - 1 }); alts.push([`${b.rec - 1}+ recámaras (${filtrar(b2).length})`, b2]); }
+      const buenas = alts.filter(a => filtrar(a[1]).length > L.length);
+      if (buenas.length) {
+        const nota = document.createElement('div'); nota.className = 'escribe'; nota.textContent = L.length ? 'Hay pocas así. Si abres un poquito la búsqueda:' : 'Así exacto no hay ahorita. Si abres un poquito la búsqueda:'; lista.appendChild(nota);
+        const a = document.createElement('div'); a.className = 'alt'; a.innerHTML = buenas.map((x, i) => `<button type="button" data-i="${i}">${esc(x[0])}</button>`).join(''); lista.appendChild(a);
+        a.querySelectorAll('button').forEach(bt => bt.onclick = () => { a.remove(); nota.remove(); mostrarBusqueda(lista, buenas[+bt.dataset.i][1]); });
+      }
     }
     lista.scrollTop = lista.scrollHeight;
   }
@@ -83,6 +119,7 @@
     historial.push({ rol: 'asistente', texto: res.texto, quien: res.quien, acciones: res.acciones });
     try { sessionStorage.setItem('ipro_preguntas', JSON.stringify(historial.slice(-20))); } catch (err) {}
     burbuja(lista, 'ia', res.texto, res.quien, res.acciones);
+    if (res.busqueda) await mostrarBusqueda(lista, res.busqueda);
     if (window.Voz && Voz.activa()) Voz.decir(res.quien, res.texto);
     if (window.Juego) Juego.sfx('coin');
   }

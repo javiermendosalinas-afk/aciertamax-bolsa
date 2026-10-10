@@ -41,25 +41,76 @@
   };
   function sfx(nombre) { if (!est.efectos) return; iniciar(); if (!ctx || !SFX[nombre]) return; SFX[nombre](ctx.currentTime + 0.01); }
 
-  // ---------- música original (bucle de 4 compases, tipo chiptune alegre) ----------
-  const MEL = [76, 79, 81, 79, 76, 74, 72, 74, 76, 76, 79, 81, 84, 81, 79, 0, 81, 81, 79, 76, 79, 76, 74, 72, 74, 76, 74, 72, 69, 72, 0, 0];
-  const BAJO = [48, 48, 55, 55, 53, 53, 55, 55];
-  const PASO_S = 60 / 128 / 2;   // corcheas a 128 bpm
+  // ---------- música generativa: 5 estilos que se turnan, acordes y melodías que cambian solos ----------
+  const ESTILOS = [
+    { n: 'Pop', bpm: 118, raiz: 60, escala: [0, 2, 4, 7, 9], progs: [[0, 5, 3, 4], [0, 3, 4, 4], [5, 3, 0, 4]], lead: 'square', bajo: 'triangle', patBajo: [1, 0, 0, 0, 1, 0, 1, 0], bat: 'pop' },
+    { n: 'Tropical', bpm: 104, raiz: 65, escala: [0, 2, 4, 7, 9], progs: [[0, 4, 5, 3], [0, 3, 4, 0], [3, 4, 0, 5]], lead: 'marimba', bajo: 'sine', patBajo: [1, 0, 0, 1, 0, 0, 1, 0], bat: 'tresillo' },
+    { n: 'Lo-fi', bpm: 82, raiz: 62, escala: [0, 3, 5, 7, 10], progs: [[0, 3, 5, 4], [5, 3, 0, 0], [0, 5, 3, 4]], lead: 'triangle', bajo: 'sine', patBajo: [1, 0, 0, 0, 0, 0, 1, 0], bat: 'lofi', swing: .18 },
+    { n: 'Aventura', bpm: 128, raiz: 62, escala: [0, 2, 3, 5, 7, 9, 10], progs: [[0, 6, 5, 6], [0, 3, 6, 4], [0, 5, 6, 0]], lead: 'square', bajo: 'sawtooth', patBajo: [1, 0, 1, 0, 1, 0, 1, 0], bat: 'pop', arpe: true },
+    { n: 'Fiesta', bpm: 138, raiz: 67, escala: [0, 2, 4, 5, 7, 9, 11], progs: [[0, 4, 0, 4], [0, 3, 4, 0], [0, 5, 3, 4]], lead: 'sawtooth', bajo: 'square', patBajo: [1, 0, 1, 1, 1, 0, 1, 1], bat: 'fiesta' }
+  ];
+  const ACORDE = { 0: [0, 4, 7], 3: [5, 9, 12], 4: [7, 11, 14], 5: [9, 12, 16], 6: [10, 14, 17] };   // grados del acorde en semitonos
+  let estilo = ESTILOS[Math.floor(Math.random() * ESTILOS.length)], prog = estilo.progs[0], motivo = [], compas = 0, energia = 0.35, ruido = null, cambiar = false;
+  function nuevoMotivo() { motivo = Array.from({ length: 8 }, (_, i) => (i % 2 === 0 || Math.random() < .45) ? Math.floor(Math.random() * 5) : null); }
+  function siguienteEstilo() { const otros = ESTILOS.filter(e => e !== estilo); estilo = otros[Math.floor(Math.random() * otros.length)]; prog = estilo.progs[Math.floor(Math.random() * estilo.progs.length)]; nuevoMotivo(); compas = 0; }
+  function golpe(t, tipo, vol) {
+    if (!ruido) { ruido = ctx.createBuffer(1, ctx.sampleRate * .3, ctx.sampleRate); const d = ruido.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    if (tipo === 'bombo') { nota(140, t, .16, 'sine', vol * 1.6, musBus, 45); return; }
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = ruido;
+    f.type = tipo === 'tarola' ? 'bandpass' : 'highpass'; f.frequency.value = tipo === 'tarola' ? 1800 : 7000;
+    const dur = tipo === 'tarola' ? .14 : .04; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(musBus); s.start(t); s.stop(t + dur + .02);
+  }
+  function tocarLead(f, t, dur, vol) {
+    if (estilo.lead === 'marimba') { nota(f, t, .22, 'sine', vol * 1.6, musBus); nota(f * 4, t, .06, 'sine', vol * .4, musBus); }
+    else nota(f, t, dur, estilo.lead, estilo.lead === 'sawtooth' ? vol * .6 : vol, musBus);
+  }
+  const PASOS_COMPAS = 8;
   function programar() {
     if (!ctx) return;
-    while (siguiente < ctx.currentTime + 0.25) {
-      const m = MEL[paso % MEL.length]; if (m) nota(N(m), siguiente, PASO_S * 0.9, 'square', 0.05, musBus);
-      if (paso % 4 === 0) { const b = BAJO[Math.floor(paso / 4) % BAJO.length]; nota(N(b), siguiente, PASO_S * 3.6, 'triangle', 0.12, musBus); }
-      if (paso % 2 === 1) nota(6000, siguiente, 0.02, 'square', 0.012, musBus);   // charleston suave
-      siguiente += PASO_S; paso++;
+    const s = 60 / estilo.bpm / 2;
+    while (siguiente < ctx.currentTime + .3) {
+      const k = paso % PASOS_COMPAS, grado = prog[compas % prog.length], ac = ACORDE[grado] || ACORDE[0];
+      const t = siguiente + (estilo.swing && k % 2 ? s * estilo.swing : 0), raiz = estilo.raiz;
+      const capaMel = energia > .2, capaArp = energia > .5 || estilo.arpe, capaBat = energia > .3;
+      // bajo
+      if (estilo.patBajo[k]) nota(N(raiz - 24 + ac[k % 4 === 0 ? 0 : (k % 3 ? 0 : 2)]), t, s * 1.7, estilo.bajo, .11, musBus);
+      // acorde suave al inicio del compás
+      if (k === 0) ac.forEach(x => nota(N(raiz - 12 + x), t, s * PASOS_COMPAS * .95, 'triangle', .022, musBus));
+      // arpegio
+      if (capaArp && k % 2 === 1) nota(N(raiz + ac[(k >> 1) % 3]), t, s * .8, 'square', .025, musBus);
+      // melodía: motivo transportado al acorde, con variaciones
+      if (capaMel) { const m = motivo[k]; if (m !== null && m !== undefined && !(compas % 4 === 3 && k > 4)) {
+        const esc = estilo.escala, idx = (m + grado + (compas % 8 >= 4 ? 1 : 0)) % esc.length, oct = (m + grado) >= esc.length ? 12 : 0;
+        tocarLead(N(raiz + esc[idx] + oct), t, s * (k % 4 === 0 ? 1.6 : .85), .045); } }
+      // batería por estilo
+      if (capaBat) {
+        const b = estilo.bat;
+        if (b === 'pop') { if (k === 0 || k === 4) golpe(t, 'bombo', .12); if (k === 2 || k === 6) golpe(t, 'tarola', .05); if (energia > .6) golpe(t, 'plato', .015); }
+        if (b === 'tresillo') { if (k === 0 || k === 3 || k === 6) golpe(t, 'bombo', .1); if (k === 4) golpe(t, 'tarola', .04); if (k % 2) golpe(t, 'plato', .012); }
+        if (b === 'lofi') { if (k === 0 || k === 5) golpe(t, 'bombo', .1); if (k === 4) golpe(t, 'tarola', .035); if (k % 2 === 0) golpe(t, 'plato', .008); }
+        if (b === 'fiesta') { if (k % 2 === 0) golpe(t, 'bombo', .1); if (k % 4 === 2) golpe(t, 'tarola', .05); golpe(t, 'plato', .01); }
+      }
+      siguiente += s; paso++;
+      if (paso % PASOS_COMPAS === 0) {
+        compas++;
+        if (compas % 4 === 0 && Math.random() < .5) nuevoMotivo();                       // nueva idea melódica
+        if (compas % 8 === 0) prog = estilo.progs[Math.floor(Math.random() * estilo.progs.length)];   // nueva progresión
+        if (cambiar || compas >= 32) { cambiar = false; transicion(); }                     // otro estilo cada ~minuto
+      }
     }
   }
-  function arrancarMusica() {
-    if (!ctx || musTimer) return; siguiente = ctx.currentTime + 0.1;
-    musBus.gain.cancelScheduledValues(ctx.currentTime); musBus.gain.setTargetAtTime(0.55, ctx.currentTime, 0.6);
-    musTimer = setInterval(programar, 90);
+  function transicion() {
+    const t0 = ctx.currentTime; musBus.gain.setTargetAtTime(0, t0, .5);
+    setTimeout(() => { siguienteEstilo(); if (musTimer) musBus.gain.setTargetAtTime(VOL_MUS, ctx.currentTime, .8); }, 1400);
   }
-  function pararMusica() { if (!ctx || !musTimer) return; musBus.gain.setTargetAtTime(0, ctx.currentTime, 0.2); clearInterval(musTimer); musTimer = null; }
+  const VOL_MUS = 0.32;
+  function arrancarMusica() {
+    if (!ctx || musTimer) return; if (!motivo.length) nuevoMotivo(); siguiente = ctx.currentTime + .1;
+    musBus.gain.cancelScheduledValues(ctx.currentTime); musBus.gain.setTargetAtTime(VOL_MUS, ctx.currentTime, .8);
+    musTimer = setInterval(programar, 80);
+  }
+  function pararMusica() { if (!ctx || !musTimer) return; musBus.gain.setTargetAtTime(0, ctx.currentTime, .2); clearInterval(musTimer); musTimer = null; }
   document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) pararMusica(); else if (est.musica) arrancarMusica(); });
 
   // ---------- confeti ----------
@@ -95,12 +146,14 @@
     b.style.cssText = 'position:fixed;right:14px;bottom:86px;z-index:99990;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font:700 13px "Plus Jakarta Sans",system-ui,sans-serif';
     b.innerHTML = `<div id="jgMenu" style="background:#fff;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.2);padding:8px;display:none;gap:4px">
       <label style="display:flex;gap:8px;align-items:center;padding:6px 8px;cursor:pointer"><input type="checkbox" id="jgMus"> 🎵 Música</label>
-      <label style="display:flex;gap:8px;align-items:center;padding:6px 8px;cursor:pointer"><input type="checkbox" id="jgSfx"> 🔔 Efectos</label></div>
+      <label style="display:flex;gap:8px;align-items:center;padding:6px 8px;cursor:pointer"><input type="checkbox" id="jgSfx"> 🔔 Efectos</label>
+      <button type="button" id="jgOtra" style="border:0;background:#FFF1E2;border-radius:10px;padding:8px;font:inherit;font-weight:800;color:#13233A;cursor:pointer">⏭️ Otra canción</button></div>
       <button type="button" id="jgBtn" aria-label="Sonido" style="width:50px;height:50px;border-radius:50%;border:3px solid #F5A04A;background:#13233A;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)"></button>`;
     document.body.appendChild(b);
     const pint = () => { document.getElementById('jgBtn').textContent = est.musica || est.efectos ? '🔊' : '🔇'; document.getElementById('jgMus').checked = est.musica; document.getElementById('jgSfx').checked = est.efectos; };
     document.getElementById('jgBtn').onclick = (e) => { e.stopPropagation(); const m = document.getElementById('jgMenu'); m.style.display = m.style.display === 'grid' ? 'none' : 'grid'; };
     document.getElementById('jgMus').onchange = (e) => { est.musica = e.target.checked; guardar(); iniciar(); est.musica ? arrancarMusica() : pararMusica(); pint(); };
+    document.getElementById('jgOtra').onclick = () => { iniciar(); if (!est.musica) { est.musica = true; guardar(); pint(); } if (!musTimer) { siguienteEstilo(); arrancarMusica(); } else cambiar = true; };
     document.getElementById('jgSfx').onchange = (e) => { est.efectos = e.target.checked; guardar(); pint(); if (est.efectos) sfx('select'); };
     document.addEventListener('click', (e) => { if (!b.contains(e.target)) document.getElementById('jgMenu').style.display = 'none'; });
     pint();
@@ -120,5 +173,6 @@
   document.addEventListener('input', (e) => { if (e.target.type === 'range' && performance.now() - ultimoTick > 70) { ultimoTick = performance.now(); sfx('tick'); } }, true);
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boton); else boton();
-  window.Juego = { sfx, logro, confeti, ganar, musica: (on) => { est.musica = on; guardar(); iniciar(); on ? arrancarMusica() : pararMusica(); } };
+  window.Juego = { sfx, logro, confeti, ganar, musica: (on) => { est.musica = on; guardar(); iniciar(); on ? arrancarMusica() : pararMusica(); },
+    energia: (v) => { energia = Math.max(0, Math.min(1, v)); }, otraCancion: () => { cambiar = true; }, estilo: () => estilo.n };
 })();

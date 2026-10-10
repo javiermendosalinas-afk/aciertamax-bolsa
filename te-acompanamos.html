@@ -111,7 +111,7 @@ function campo(tipo,ph,alEnviar,{valor='',saltar=false,boton='Listo',modo='',sal
  const enviar=()=>{const v=$('inp').value.trim();const e=alEnviar(v);if(typeof e==='string'){$('err').textContent=e;return;}};
  $('ok').onclick=enviar;$('inp').onkeydown=e=>{if(e.key==='Enter')enviar();};if(saltar)$('skip').onclick=()=>{yo(saltarTxt);r.innerHTML='';alEnviar(null);};
  setTimeout(()=>$('inp')&&$('inp').focus(),50);bajar();}
-function progreso(p,txt){$('riel').style.width=Math.min(100,p)+'%';$('rielTxt').textContent=txt;}
+function progreso(p,txt){$('riel').style.width=Math.min(100,p)+'%';$('rielTxt').textContent=txt;window.Juego&&Juego.energia&&Juego.energia(.25+p/100*.7);}
 
 // ---------- cálculos ----------
 const grupo={casa:'c',departamento:'d',terreno:'t'};

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Sofía, asesora virtual de inmobiliaria.pro">
+<circle cx="60" cy="60" r="60" fill="#FDE7CF"/>
+<path d="M27 112c4-22 18-32 33-32s29 10 33 32a60 60 0 0 1-66 0z" fill="#E07812"/>
+<path d="M50 80h20l-2 10h-16z" fill="#E9B48F"/>
+<path d="M30 62c-4-30 12-46 31-46s34 15 30 44c-1 10-4 20-9 26 3-12 3-24-1-32-8 4-24 6-38 2-4 8-4 20-1 32-7-6-11-16-12-26z" fill="#5B3A29"/>
+<ellipse cx="60" cy="60" rx="22" ry="25" fill="#F2C29B"/>
+<path d="M38 52c6-14 30-18 44-4-4-12-14-18-24-18s-18 8-20 22z" fill="#5B3A29"/>
+<circle cx="51" cy="60" r="2.8" fill="#13233A"/><circle cx="69" cy="60" r="2.8" fill="#13233A"/>
+<path d="M46 53q5-3 10 0M64 53q5-3 10 0" stroke="#5B3A29" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M51 71q9 8 18 0" stroke="#B4473A" stroke-width="3" fill="none" stroke-linecap="round"/>
+<circle cx="46" cy="67" r="4" fill="#F4A08A" opacity=".5"/><circle cx="74" cy="67" r="4" fill="#F4A08A" opacity=".5"/>
+<circle cx="38" cy="66" r="2.5" fill="#F5A04A"/><circle cx="82" cy="66" r="2.5" fill="#F5A04A"/>
+</svg>

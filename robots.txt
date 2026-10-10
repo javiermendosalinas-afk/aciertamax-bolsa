@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+Sitemap: https://inmobiliaria.pro/sitemap.xml
+Sitemap: https://inmobiliaria.pro/sitemap-presupuesto.xml

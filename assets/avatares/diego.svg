@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Diego, asesor virtual de inmobiliaria.pro">
+<circle cx="60" cy="60" r="60" fill="#DCE6F2"/>
+<path d="M25 112c4-22 19-32 35-32s31 10 35 32a60 60 0 0 1-70 0z" fill="#13233A"/>
+<path d="M52 80h16l4 8-12 8-12-8z" fill="#FFFFFF"/>
+<path d="M50 78h20l-2 9h-16z" fill="#D9A27C"/>
+<ellipse cx="60" cy="58" rx="23" ry="25" fill="#E3AE86"/>
+<path d="M36 52c-2-20 10-30 26-30 14 0 25 8 24 28-6-10-16-14-27-13-9 1-17 6-23 15z" fill="#2B2320"/>
+<path d="M40 64c2 14 10 20 20 20s18-6 20-20c-3 6-8 9-20 9s-17-3-20-9z" fill="#3A2E29" opacity=".85"/>
+<circle cx="51" cy="57" r="2.8" fill="#13233A"/><circle cx="69" cy="57" r="2.8" fill="#13233A"/>
+<path d="M45 50q6-3 11 0M64 50q6-3 11 0" stroke="#2B2320" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<path d="M51 68q9 7 18 0" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+<ellipse cx="36" cy="59" rx="3" ry="5" fill="#E3AE86"/><ellipse cx="84" cy="59" rx="3" ry="5" fill="#E3AE86"/>
+</svg>

@@ -24,13 +24,14 @@ jobs:
           python-version: '3.12'
       - run: pip install requests
       - run: python herramientas/traer_bolsa.py
+      - run: python herramientas/generar_presupuesto.py
       - name: Publicar
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "bolsa-bot"
           git config user.email "bolsa-bot@users.noreply.github.com"
-          git add data.json inventario-meta.json
+          git add data.json inventario-meta.json presupuesto presupuesto.css sitemap-presupuesto.xml sitemap.xml robots.txt
           if git diff --cached --quiet; then echo "Sin cambios"; else
             git commit -m "Bolsa: inventario $(date -u +%F)"
             git pull --rebase -q || true

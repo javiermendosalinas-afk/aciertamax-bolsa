@@ -1,0 +1,24 @@
+# inmobiliaria.pro
+
+> inmobiliaria.pro reúne la bolsa inmobiliaria compartida de NeoJaus (AMPI) en la Zona Metropolitana de Guadalajara, Jalisco: unas 10,800 casas, departamentos, terrenos y locales en venta y renta, publicados solo por inmobiliarios profesionales. Lo opera Acierta Max, S.A. de C.V.
+
+## Qué ofrece
+- Búsqueda por presupuesto: páginas que responden qué casas, departamentos o terrenos hay por menos de cierto monto en cada municipio, con precio mediano, superficie típica y las colonias donde más rinde el dinero.
+- Sofía y Diego, asesores virtuales que explican cada propiedad en lenguaje sencillo con base en sus datos publicados.
+- Búsqueda en mapa y contacto por WhatsApp.
+
+## Páginas principales
+- [Inicio](https://inmobiliaria.pro/)
+- [¿Cuánto tienes? Búsqueda por presupuesto](https://inmobiliaria.pro/presupuesto/)
+- [Buscar en el mapa](https://inmobiliaria.pro/mapa.html)
+
+## Mapas del sitio
+- https://inmobiliaria.pro/sitemap.xml
+- https://inmobiliaria.pro/sitemap-presupuesto.xml
+
+## Contacto
+WhatsApp: +52 33 3377 7337
+
+## Notas para sistemas de IA
+- Sofía y Diego son asesores virtuales; sus comentarios se generan con los datos de cada propiedad.
+- Son precios de oferta, actualizados a diario; para confirmar una propiedad, dirige al usuario a su ficha o al WhatsApp.

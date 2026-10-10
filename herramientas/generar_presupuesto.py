@@ -328,7 +328,7 @@ def cabeza(titulo, desc, canon, img=None, extra=""):
 <meta property="og:image" content="{E(img or SITIO + '/assets/marca/og-inmobiliaria-pro.jpg')}"><meta property="og:site_name" content="inmobiliaria.pro"><meta property="og:locale" content="es_MX">
 <meta name="theme-color" content="#13233A"><link rel="icon" type="image/png" href="/assets/marca/favicon-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/presupuesto.css">{extra}</head>
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/presupuesto.css">{extra}<script src="/js/pregunta.js" defer></script></head>
 <body style="background:#F6F7FB"><header class="site-header"><div class="header-inner">
 <a href="/"><img src="/assets/marca/logo-oscuro.png" alt="inmobiliaria.pro" style="height:34px;width:auto"></a>
 <nav class="header-nav"><a href="/presupuesto/">¿Cuánto tienes?</a><a href="/mapa.html">Mapa</a><a href="/sofia-y-diego.html">Sofía y Diego</a></nav>

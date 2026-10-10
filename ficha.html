@@ -48,6 +48,7 @@ body{background:var(--papel)}
 <div class="fi-barra" id="barra" hidden></div>
 <script src="/assets/vendor/leaflet/leaflet.js"></script>
 <script src="/js/juego.js"></script>
+<script src="/js/pregunta.js"></script>
 <script>
 (function(){
 'use strict';
@@ -76,6 +77,7 @@ Promise.all([fetch('/presupuesto/buscador.json').then(r=>r.json()).catch(()=>[])
  const d=det[clave]||{};const fotos=(d.uid&&(d.fotos||[]).length)?d.fotos.map(n=>'https://cdn.neojaus.com/properties/'+d.uid+'/'+n):(p.f?[p.f]:[]);
  const tipoTxt=p.tipo||({c:'Casa',d:'Departamento',t:'Terreno'})[p.g]||'Propiedad', renta=p.o==='R';
  document.title=`${p.x} · ${din(p.p)}${renta?'/mes':''} | inmobiliaria.pro`;
+ window.PERFIL_IPRO={viendo_propiedad:p.x,precio:din(p.p)+(renta?' al mes':''),zona:[p.c,p.m].filter(Boolean).join(', '),clave:p.e,recamaras:p.r,m2:p.s};
  const comps=D.filter(x=>x.m===p.m&&x.g===p.g&&x.o===p.o).map(pm2);const ref=mediana(comps);const v=pm2(p);const dif=v&&ref?(v/ref-1)*100:null;
  const bueno=[],ojo=[];if(dif!==null){if(dif>-45&&dif<=-12)bueno.push(`por m² sale ${Math.abs(dif).toFixed(0)}% más barata que el promedio de ${esc(p.m)}`);else if(dif<=-45)ojo.push('su precio por m² está demasiado abajo de la zona: confirma la superficie real y el estado');else if(dif>=12)ojo.push(`su m² va ${dif.toFixed(0)}% arriba del promedio de ${esc(p.m)}: pregunta qué lo justifica y negocia`);else bueno.push(`su precio por m² es justo para ${esc(p.m)}`);}
  if(p.g!=='t'){if(p.r>=3)bueno.push(`tiene ${p.r} recámaras`);if(p.t&&p.s&&p.t>p.s*1.4)bueno.push(`trae ${p.t} m² de terreno, con espacio para crecer`);if(p.r&&p.s&&p.s/p.r<22)ojo.push(`los espacios son compactos: unos ${Math.round(p.s/p.r)} m² por recámara`);}

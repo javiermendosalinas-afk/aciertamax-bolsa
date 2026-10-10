@@ -87,6 +87,7 @@ body{background:var(--papel);font-family:'Plus Jakarta Sans',system-ui,sans-seri
 <script src="/assets/vendor/leaflet/leaflet.js"></script>
 <script src="/js/juego.js"></script>
 <script src="/js/voz.js"></script>
+<script src="/js/pregunta.js"></script>
 <script>
 (function(){
 'use strict';
@@ -98,7 +99,9 @@ const din=v=>'$'+Math.round(v||0).toLocaleString('es-MX'), num=v=>parseFloat(Str
 let S=JSON.parse(localStorage.getItem('ipro_acomp')||'null')||{favoritas:[],imprescindibles:[]};
 const URLQ=new URLSearchParams(location.search),FAV=(URLQ.get('fav')||'').toUpperCase().replace(/[^A-Z0-9-]/g,''),PREOP=['compra','renta'].includes(URLQ.get('op'))?URLQ.get('op'):'';
 let CFG={endpoint:'https://aciertamax-webhook.onrender.com/api/camino',avisoVersion:''}, DATA=null, paso=0, sondeo=null;
-const guardar=()=>{try{localStorage.setItem('ipro_acomp',JSON.stringify(S))}catch(e){}};
+const guardar=()=>{try{localStorage.setItem('ipro_acomp',JSON.stringify(S))}catch(e){}
+ window.PERFIL_IPRO={nombre:S.nombre,quiere:[S.operacion,S.tipo,S.uso].filter(Boolean).join(' '),zona:S.municipio,presupuesto:S.presupuesto?('$'+Math.round(S.presupuesto).toLocaleString('es-MX')):'',
+  le_alcanza:S.precalif&&S.precalif.alcance?('$'+S.precalif.alcance.toLocaleString('es-MX')):'',credito:S.credito,motivo:S.motivo,prioridades:(S.prioridades||[]).join(', '),recamaras:S.recamaras};};
 fetch('/camino-datos.json').then(r=>r.json()).then(j=>{CFG=Object.assign(CFG,j)}).catch(()=>{});
 const cargarDatos=()=>DATA?Promise.resolve(DATA):fetch('/presupuesto/buscador.json').then(r=>r.json()).then(j=>DATA=j).catch(()=>DATA=[]);
 cargarDatos();

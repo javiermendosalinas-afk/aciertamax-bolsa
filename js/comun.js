@@ -459,7 +459,7 @@
       <label>Tu nombre</label><input type="text" id="amNombre" maxlength="80">
       <label>Tu WhatsApp (10 dígitos)</label><input type="tel" id="amWa" inputmode="numeric" maxlength="20">
       <div id="amVerifWA"></div>
-      <label for="amCoach">¿Ya conoces a un coach de Acierta Max? <span class="muted">(opcional)</span></label>
+      <label for="amCoach">¿Ya conoces a algún asesor? <span class="muted">(opcional)</span></label>
       <select id="amCoach"><option value="">No, que me asignen uno</option>${(coaches || []).map(n => `<option>${AM.esc(n)}</option>`).join('')}</select>
       <label class="am-consent"><input type="checkbox" id="amConsent"> <span>Acepto que Acierta Max guarde mis datos y me contacte por WhatsApp, conforme al <a href="aviso-privacidad.html" target="_blank" rel="noopener">Aviso de privacidad</a>.</span></label>
       <div class="am-modal-error" id="amModalError" style="display:none"></div>

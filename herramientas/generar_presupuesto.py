@@ -246,6 +246,9 @@ CSS = """
 .bq-pista{position:absolute;top:10px;left:54px;right:10px;z-index:500;background:#fff;border-radius:16px;padding:8px 12px;display:flex;gap:8px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:.88rem;font-weight:600}
 .bq-pista img{width:38px;height:auto}
 .pin-precio.on{background:#E07812;color:#fff;transform:scale(1.25)}
+.bq-zona{position:absolute;left:10px;bottom:10px;z-index:501;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bq-zona button{border:0;background:#13233A;color:#fff;border-radius:999px;padding:9px 13px;font:inherit;font-weight:800;font-size:.85rem;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.bq-zona button.on{background:#E07812}.bq-zona .r{background:#fff;color:#13233A;border-radius:999px;padding:7px 11px;font-weight:800;font-size:.85rem;box-shadow:0 3px 10px rgba(0,0,0,.2)}
 .bq-tabs{display:none;gap:8px;margin:12px 0 0}.bq-tabs button{flex:1;border:2px solid #E6E9F0;background:#fff;border-radius:14px;padding:10px;font:inherit;font-weight:800;color:#13233A;cursor:pointer}.bq-tabs button.on{background:#13233A;color:#fff;border-color:#13233A}
 .pr-card .enmapa{background:none;border:0;color:#E07812;font:inherit;font-weight:800;cursor:pointer;text-align:left;padding:0}
 @media(max-width:600px){.pr-burbuja figure img{width:78px}}
@@ -265,7 +268,7 @@ BUSCADOR = '''<link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
 <div id="bqResumen"></div>
 <div class="bq-tabs" role="tablist"><button type="button" class="on" data-tab="lista">📋 Lista</button><button type="button" data-tab="mapa">🗺️ Mapa</button></div>
 <div class="bq-res ver-lista" id="bqRes"><div><div class="bq-lista" id="bqLista"></div></div><div class="bq-mapwrap"><div id="bqMapa"></div>
-<div class="bq-pista" id="bqPista"><img src="/assets/avatares/sofia-senala.svg" alt="" width="38">Toca un globito y te cuento de esa propiedad</div><div id="bqSel"></div></div></div>
+<div class="bq-zona" id="bqZona"><button type="button" id="zBtn">📍 Elegir zona en el mapa</button></div><div class="bq-pista" id="bqPista"><img src="/assets/avatares/sofia-senala.svg" alt="" width="38">Toca un globito y te cuento de esa propiedad</div><div id="bqSel"></div></div></div>
 </section>
 <script src="/assets/vendor/leaflet/leaflet.js"></script>
 <script src="/js/juego.js"></script>
@@ -280,7 +283,8 @@ const ZONA={'Zapopan':'Zapopan es el que más oferta tiene. Por Valle Real, Puer
  'Tlajomulco de Zúñiga':'En Tlajomulco hay fraccionamientos nuevos con buen precio por m². Antes de decidir, calcula tus traslados en hora pico por López Mateos o la carretera a Chapala.',
  '':'En toda la zona metropolitana hay de todo. Si tienes una zona en mente, elígela arriba y afino la búsqueda.'};
 const RANGO={'Vc':[1e6,15e6,25e4,4e6],'Vd':[1e6,10e6,25e4,3e6],'Vt':[3e5,1e7,1e5,2e6],'Rc':[5e3,8e4,1e3,2e4],'Rd':[4e3,5e4,1e3,15e3],'Rt':[5e3,1e5,1e3,2e4]};
-let D=[],ref={},est={o:'V',g:'c',m:'',r:0,tope:null,k:''},mapa,capa;
+let D=[],ref={},est={o:'V',g:'c',m:'',r:0,tope:null,k:'',z:null},mapa,capa,capaZona,modoZona=false;
+const km=(a,b,c,d)=>{const R=6371,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b),h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h));};
 const $=id=>document.getElementById(id), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const din=v=>'$'+Math.round(v).toLocaleString('es-MX'), corto=v=>v>=1e6?'$'+(v/1e6).toFixed(v>=1e7?0:1).replace('.0','')+'M':'$'+Math.round(v/1e3)+'k';
 const sup=p=>p.g==='t'?p.t:(p.s||0), pm2=p=>sup(p)>0?p.p/sup(p):null;
@@ -324,10 +328,10 @@ function rango(){const r=RANGO[est.o+est.g],s=$('bqTope');s.min=r[0];s.max=r[1];
  $('bqTopeTxt').textContent='Hasta '+din(est.tope)+(est.o==='R'?' al mes':'');$('bqRecPaso').style.display=$('bqRec').style.display=est.g==='t'?'none':'';}
 let mostrar=24;
 function pintar(){rango();
- const L=D.filter(p=>p.o===est.o&&p.g===est.g&&(!est.m||p.m===est.m)&&p.p<=est.tope&&(est.g==='t'||p.r>=est.r)&&[...(est.k||'')].every(c=>(p.k||'').includes(c)));
+ const L=D.filter(p=>p.o===est.o&&p.g===est.g&&(est.z?(p.a&&km(est.z.lat,est.z.lon,p.a,p.n)<=est.z.r):(!est.m||p.m===est.m))&&p.p<=est.tope&&(est.g==='t'||p.r>=est.r)&&[...(est.k||'')].every(c=>(p.k||'').includes(c)));
  const clave=p=>{const r0=ref[p.m+p.g+p.o],v=pm2(p),x=v&&r0?v/r0:1.5;return x>=.55?x:3+x};
  L.sort((a,b)=>clave(a)-clave(b)||b.p-a.p);
- const tipo={c:'casas',d:'depas',t:'terrenos'}[est.g],lugar=est.m||'toda la zona metropolitana';
+ const tipo={c:'casas',d:'depas',t:'terrenos'}[est.g],lugar=est.z?`tu zona del mapa (${est.z.r} km)`:(est.m||'toda la zona metropolitana');
  if(!L.length){if(tocado&&window.Juego&&Date.now()-ultSon>1500){ultSon=Date.now();Juego.sfx('lose');}$('bqResumen').innerHTML=`<div class="pr-burbuja"><figure><img src="${AV.DP}" alt="" width="104" height="113"><figcaption>Diego</figcaption></figure><div class="txt"><b class="n">DIEGO DICE</b>Mmm… con esos filtros no encontré ${tipo} en ${esc(lugar)}. Súbele tantito al presupuesto, prueba otra zona${est.k?' o quita algún indispensable':''}, ¡seguro sale algo!</div></div>`;$('bqLista').innerHTML='';capa.clearLayers();location.hash='';return;}
  const m=med(L.map(p=>p.p)),s=med(L.map(sup)),r=med(L.filter(p=>p.r).map(p=>p.r));
  const cols={};L.forEach(p=>{if(p.c)(cols[p.c]=cols[p.c]||[]).push(p)});
@@ -342,17 +346,26 @@ function pintar(){rango();
  const q=(arr,f)=>{const s=arr.slice().sort((x,y)=>x-y);return s[Math.min(s.length-1,Math.max(0,Math.floor(f*(s.length-1))))];};
  const la=pts.map(x=>x[0]),ln=pts.map(x=>x[1]),cerca=pts.length>8?pts.filter(x=>x[0]>=q(la,.08)&&x[0]<=q(la,.92)&&x[1]>=q(ln,.08)&&x[1]<=q(ln,.92)):pts;
  ultPts=cerca.length?cerca:pts;mapa.invalidateSize();if(ultPts.length)mapa.fitBounds(ultPts,{padding:[30,30],maxZoom:14});
- if(tocado&&window.Juego)Juego.logro('Explorador: encontraste opciones','🔎');history.replaceState(null,'','#'+new URLSearchParams(Object.assign({o:est.o,g:est.g,m:est.m,r:est.r,tope:est.tope},est.k?{k:est.k}:{},$('bqRes').classList.contains('ver-mapa')?{vista:'mapa'}:{})));}
+ if(tocado&&window.Juego)Juego.logro('Explorador: encontraste opciones','🔎');history.replaceState(null,'','#'+new URLSearchParams(Object.assign({o:est.o,g:est.g,m:est.m,r:est.r,tope:est.tope},est.k?{k:est.k}:{},est.z?{z:[est.z.lat.toFixed(4),est.z.lon.toFixed(4),est.z.r].join(',')}:{},$('bqRes').classList.contains('ver-mapa')?{vista:'mapa'}:{})));}
 document.querySelectorAll('.bq-ops').forEach(g=>g.addEventListener('click',e=>{if(!g.dataset.campo)return;tocado=true;const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
- const c=g.dataset.campo;est[c]=c==='r'?+b.dataset.v:b.dataset.v;if(c==='o'||c==='g')est.tope=null;mostrar=24;pintar();}));
+ const c=g.dataset.campo;est[c]=c==='r'?+b.dataset.v:b.dataset.v;if(c==='m'&&est.z){est.z=null;pintarZona();}if(c==='o'||c==='g')est.tope=null;mostrar=24;pintar();}));
 document.querySelectorAll('.bq-tabs button').forEach(x=>x.onclick=()=>tab(x.dataset.tab));
 document.querySelectorAll('#bqExtras button').forEach(x=>{x.classList.toggle('on',(est.k||'').includes(x.dataset.k));x.onclick=()=>{tocado=true;const c=x.dataset.k;est.k=(est.k||'').includes(c)?est.k.replace(c,''):(est.k||'')+c;x.classList.toggle('on');mostrar=24;pintar();};});
 $('bqTope').addEventListener('input',e=>{tocado=true;est.tope=+e.target.value;mostrar=24;pintar();});
 mapa=LF.map('bqMapa',{scrollWheelZoom:false}).setView([20.67,-103.38],11);
-LF.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapa);capa=LF.layerGroup().addTo(mapa);
-const q=new URLSearchParams(location.hash.slice(1));const verMapa=q.get('vista')==='mapa';['o','g','m','k'].forEach(k=>{if(q.has(k))est[k]=q.get(k)});document.querySelectorAll('#bqExtras button').forEach(x=>x.classList.toggle('on',(est.k||'').includes(x.dataset.k)));if(q.has('r'))est.r=+q.get('r');if(q.has('tope'))est.tope=+q.get('tope');
+LF.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapa);capa=LF.layerGroup().addTo(mapa);capaZona=LF.layerGroup().addTo(mapa);
+function pintarZona(){capaZona.clearLayers();const zb=$('bqZona');
+ if(est.z){LF.circle([est.z.lat,est.z.lon],{radius:est.z.r*1000,color:'#13233A',weight:2,fillColor:'#F5A04A',fillOpacity:.12}).addTo(capaZona);
+  LF.marker([est.z.lat,est.z.lon],{icon:LF.divIcon({className:'',html:'<div style="font-size:28px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))">🏠</div>',iconSize:[28,28],iconAnchor:[14,26]})}).addTo(capaZona);
+  zb.innerHTML=`<button type="button" id="zMenos">−</button><span class="r">${est.z.r} km</span><button type="button" id="zMas">+</button><button type="button" id="zQuitar">Quitar zona</button>`;
+  $('zMenos').onclick=()=>{est.z.r=Math.max(1,est.z.r-1);pintarZona();pintar();};$('zMas').onclick=()=>{est.z.r=Math.min(15,est.z.r+1);pintarZona();pintar();};
+  $('zQuitar').onclick=()=>{est.z=null;pintarZona();pintar();};}
+ else{zb.innerHTML=`<button type="button" id="zBtn" class="${modoZona?'on':''}">${modoZona?'👆 Toca el lugar en el mapa':'📍 Elegir zona en el mapa'}</button>`;$('zBtn').onclick=()=>{modoZona=!modoZona;$('bqPista').style.display='none';pintarZona();};}}
+mapa.on('click',e=>{if(!modoZona&&!est.z)return;if(!modoZona&&est.z)return;est.z={lat:e.latlng.lat,lon:e.latlng.lng,r:3};modoZona=false;tocado=true;window.Juego&&Juego.sfx('pop');
+ document.querySelectorAll('[data-campo=m] button').forEach(x=>x.classList.toggle('on',x.dataset.v===''));est.m='';pintarZona();mostrar=24;pintar();});
+const q=new URLSearchParams(location.hash.slice(1));const verMapa=q.get('vista')==='mapa';['o','g','m','k'].forEach(k=>{if(q.has(k))est[k]=q.get(k)});if(q.get('z')){const z=q.get('z').split(',').map(Number);if(z.length===3&&z.every(x=>!isNaN(x)))est.z={lat:z[0],lon:z[1],r:z[2]};}document.querySelectorAll('#bqExtras button').forEach(x=>x.classList.toggle('on',(est.k||'').includes(x.dataset.k)));if(q.has('r'))est.r=+q.get('r');if(q.has('tope'))est.tope=+q.get('tope');
 document.querySelectorAll('.bq-ops').forEach(g=>{const c=g.dataset.campo;if(!c)return;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',String(b.dataset.v)===String(est[c])))});
-fetch('/presupuesto/buscador.json').then(r=>r.json()).then(j=>{D=j;if(verMapa){tab('mapa');setTimeout(()=>{document.getElementById('bqMapa').scrollIntoView({block:'center'});},300);}const gr={};D.forEach(p=>{const v=pm2(p);if(v)(gr[p.m+p.g+p.o]=gr[p.m+p.g+p.o]||[]).push(v)});for(const k in gr)ref[k]=med(gr[k]);pintar();});
+pintarZona();fetch('/presupuesto/buscador.json').then(r=>r.json()).then(j=>{D=j;if(verMapa){tab('mapa');setTimeout(()=>{document.getElementById('bqMapa').scrollIntoView({block:'center'});},300);}const gr={};D.forEach(p=>{const v=pm2(p);if(v)(gr[p.m+p.g+p.o]=gr[p.m+p.g+p.o]||[]).push(v)});for(const k in gr)ref[k]=med(gr[k]);pintar();});
 })();
 </script>'''
 

@@ -187,7 +187,7 @@ function vistaRapida(p,elegida,alElegir){const d=det(p);const fotos=(d.uid&&(d.f
 const CRIT={precio:'Precio',ubicacion:'Ubicación y traslados',espacio:'Espacio',seguridad:'Seguridad',amenidades:'Amenidades',lista:'Lista para habitar'};
 const RAZON={precio:'buen precio para lo que buscas',ubicacion:'buena ubicación para tu día a día',espacio:'buen espacio',seguridad:'seguridad',amenidades:'amenidades',lista:'lista para habitar'};
 const MEJOR={precio:'la de mejor precio',ubicacion:'la mejor ubicada para tu día a día',espacio:'la de más espacio',seguridad:'la más segura',amenidades:'la de mejores amenidades',lista:'la más lista para habitar'};
-function relativas(L){const pri=(S.prioridades||[]).concat(Object.keys(CRIT));return L.map(p=>{for(const k of pri){const otros=L.filter(x=>x!==p).map(x=>x.cal.s[k]);if(otros.length&&p.cal.s[k]>Math.max(...otros)+.04)return MEJOR[k];}const m2=x=>(x.s||x.t)?x.p/(x.s||x.t):1e12,om=L.filter(x=>x!==p).map(m2);if(om.length&&m2(p)<Math.min(...om)*.95)return 'la de mejor precio por m²';
+function relativas(L){if(L.length===1)return['tu mejor opción con lo que buscas'];const pri=(S.prioridades||[]).concat(Object.keys(CRIT));return L.map(p=>{for(const k of pri){const otros=L.filter(x=>x!==p).map(x=>x.cal.s[k]);if(otros.length&&p.cal.s[k]>Math.max(...otros)+.04)return MEJOR[k];}const m2=x=>(x.s||x.t)?x.p/(x.s||x.t):1e12,om=L.filter(x=>x!==p).map(m2);if(om.length&&m2(p)<Math.min(...om)*.95)return 'la de mejor precio por m²';
  const tr=x=>x.t||0,ot=L.filter(x=>x!==p).map(tr);if(ot.length&&tr(p)>Math.max(...ot)*1.15)return 'la de más terreno';
  return 'muy parecida a las otras en lo que más te importa';});}
 let DET={};
@@ -323,7 +323,13 @@ const PASOS=[
  ()=>{decir('Sofía','Y la decisión final, ¿la tomas tú o con alguien más? Así invitamos a quien deba estar en la visita.','S');
   opciones([['solo','🙋 Yo solo(a)'],['pareja','💑 Con mi pareja'],['familia','👨‍👩‍👧 Con mi familia'],['socio','🤝 Con socio(s)']],v=>{S.decide=v;window.Juego&&Juego.logro('¡Perfil completo!','📋');sig();});},
  ()=>{progreso(86,'Tus 3 para visitar');cargarDatos().then(async()=>{const o=S.operacion==='renta'?'R':'V',g=grupo[S.tipo];let cand=(DATA||[]).filter(p=>p.o===o&&p.g===g&&p.p<=techo()&&(g==='t'||!S.recamaras||p.r>=S.recamaras)&&enZona(p)&&(p.s||p.t));
-  if(cand.length<6&&S.zona){S.zona.r+=3;cand=(DATA||[]).filter(p=>p.o===o&&p.g===g&&p.p<=techo()&&(g==='t'||!S.recamaras||p.r>=S.recamaras)&&enZona(p)&&(p.s||p.t));}
+  const buscar=()=>(DATA||[]).filter(p=>p.o===o&&p.g===g&&p.p<=techo()&&(g==='t'||!S.recamaras||p.r>=S.recamaras)&&enZona(p)&&(p.s||p.t));
+  let amplie='';const r0=S.zona?S.zona.r:0;
+  for(let i=0;i<3&&cand.length<6&&S.zona;i++){S.zona.r+=3;cand=buscar();}
+  if(S.zona&&S.zona.r>r0)amplie=`amplié tu círculo a ${S.zona.r} km`;
+  if(cand.length<6&&S.zona){const z=S.zona;S.zona=null;cand=buscar();if(cand.length<6&&S.municipio&&S.municipio!=='cualquiera'){const m=S.municipio;S.municipio='cualquiera';cand=buscar();S.municipio=m;amplie='busqué en toda la zona metropolitana';}else amplie=`busqué en todo ${S.municipio&&S.municipio!=='cualquiera'?S.municipio:'tu municipio'}`;S.zona=z;
+   if(amplie.includes('toda'))cand=(DATA||[]).filter(p=>p.o===o&&p.g===g&&p.p<=techo()&&(g==='t'||!S.recamaras||p.r>=S.recamaras)&&(p.s||p.t));}
+  if(amplie)decir('Diego',`Ojo: con tu presupuesto había pocas opciones en tu zona, así que ${amplie}. Te las ordeno por lo que más te importa, incluida la cercanía.`,'DL');
   const reqK=(S.imprescindibles.includes('Acepta mascotas')?'M':'')+(S.imprescindibles.includes('Jardín o patio')?'J':'');
   if(reqK){const conK=cand.filter(p=>[...reqK].every(c=>(p.k||'').includes(c)));
    if(conK.length>=3)cand=conK;else{const etiqueta=reqK.includes('M')?'acepten mascotas':'tengan jardín';decir('Diego',conK.length?`Ojo: solo ${conK.length} de tu zona y presupuesto dicen que ${etiqueta}; te las pongo primero y te dejo otras cercanas. En la visita confírmalo con el dueño.`:`Ojo: en tu zona y presupuesto ninguna dice que ${etiqueta}. Te muestro las que mejor te quedan; muchas sí lo aceptan aunque no lo publiquen, y tu asesor lo confirma.`,'DL');

@@ -52,6 +52,9 @@
 .bq-pista{position:absolute;top:10px;left:54px;right:10px;z-index:500;background:#fff;border-radius:16px;padding:8px 12px;display:flex;gap:8px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:.88rem;font-weight:600}
 .bq-pista img{width:38px;height:auto}
 .pin-precio.on{background:#E07812;color:#fff;transform:scale(1.25)}
+.bq-zona{position:absolute;left:10px;bottom:10px;z-index:501;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bq-zona button{border:0;background:#13233A;color:#fff;border-radius:999px;padding:9px 13px;font:inherit;font-weight:800;font-size:.85rem;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.bq-zona button.on{background:#E07812}.bq-zona .r{background:#fff;color:#13233A;border-radius:999px;padding:7px 11px;font-weight:800;font-size:.85rem;box-shadow:0 3px 10px rgba(0,0,0,.2)}
 .bq-tabs{display:none;gap:8px;margin:12px 0 0}.bq-tabs button{flex:1;border:2px solid #E6E9F0;background:#fff;border-radius:14px;padding:10px;font:inherit;font-weight:800;color:#13233A;cursor:pointer}.bq-tabs button.on{background:#13233A;color:#fff;border-color:#13233A}
 .pr-card .enmapa{background:none;border:0;color:#E07812;font:inherit;font-weight:800;cursor:pointer;text-align:left;padding:0}
 @media(max-width:600px){.pr-burbuja figure img{width:78px}}

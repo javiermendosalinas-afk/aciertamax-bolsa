@@ -128,6 +128,33 @@
     const b = document.createElement('button'); b.type = 'button'; b.className = 'pq-fab'; b.setAttribute('aria-label', 'Pregúntale a Sofía y Diego');
     b.innerHTML = '<img src="/assets/avatares/sofia.svg" alt=""><span>Pregúntanos</span>'; b.onclick = () => abrir(); document.body.appendChild(b);
   }
+  // Todo botón de WhatsApp lleva lo que el cliente ya eligió, para que MAX continúe desde ahí
+  function mensajeConContexto(base) {
+    let S = {}; try { S = JSON.parse(localStorage.getItem('ipro_acomp') || '{}'); } catch (e) {}
+    const P = window.PERFIL_IPRO || {}, d = v => '$' + Math.round(v).toLocaleString('es-MX'), partes = [];
+    if (S.nombre) partes.push(`Soy ${S.nombre}.`);
+    if (S.operacion || S.tipo) {
+      let b = `Busco ${S.operacion === 'renta' ? 'rentar' : 'comprar'} ${({ casa: 'casa', departamento: 'depa', terreno: 'terreno' })[S.tipo] || ''}`.trim();
+      if (S.municipio && S.municipio !== 'cualquiera') b += ` en ${S.municipio}${S.zona ? ` (zona de ${S.zona.r} km que marqué en el mapa)` : ''}`;
+      if (S.presupuesto) b += ` hasta ${d(S.presupuesto)}${S.operacion === 'renta' ? ' al mes' : ''}`;
+      if (S.recamaras) b += `, ${S.recamaras}+ recámaras`;
+      if ((S.imprescindibles || []).length) b += `, con: ${S.imprescindibles.join(', ')}`;
+      partes.push(b + '.');
+    }
+    if (S.precalif && S.precalif.alcance) partes.push(`Mi precalificación estimada: hasta ${d(S.precalif.alcance)}.`);
+    const fav = (S.seleccion && S.seleccion.length ? S.seleccion : S.favoritas) || [];
+    if (fav.length) partes.push(`Mis favoritas: ${fav.slice(0, 3).join(', ')}.`);
+    if (P.clave) partes.push(`Me interesa la ${P.clave}: ${P.viendo_propiedad || ''} (${P.precio || ''}).`);
+    if (S.folio) partes.push(`Folio ${S.folio}.`);
+    base = base.trim(); if (!/[.!?)]$/.test(base)) base += '.';
+    return (base + ' ' + partes.join(' ')).trim().slice(0, 700);
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href*="wa.me/523333777337"]'); if (!a) return;
+    try { const u = new URL(a.href), base = (u.searchParams.get('text') || 'Hola, vengo de inmobiliaria.pro.').split(' Soy ')[0];
+      const msg = mensajeConContexto(/inmobiliaria\.pro/.test(base) ? base : base + ' (vengo de inmobiliaria.pro)');
+      u.searchParams.set('text', msg); a.href = u.toString(); } catch (err) {}
+  }, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boton); else boton();
   window.Pregunta = { abrir };
 })();

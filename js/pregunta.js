@@ -10,6 +10,7 @@
     bellavittoria: { t: '🏢 Ver Bella Vittoria', u: 'https://residencialbellavittoria.com' },
     eleve: { t: '🏙️ Ver Élevé Valle Real', u: 'https://acierta.pro/blog/eleve-valle-real-zapopan.html' },
     villadhara: { t: '🌳 Ver Villa Dhara', u: 'https://acierta.pro/blog/villa-dhara-parque-morelos.html' },
+    iteso: { t: '🎓 Ver el depa junto al ITESO', u: 'https://acierta.pro/ficha.html?eb=EB-WG7125&op=RENTA' },
     ideas: { t: '🛋️ Ideas de decoración e interiorismo', u: 'https://acierta.pro/blog/' },
     whatsapp: { t: '💬 Hablar con un asesor', u: 'https://wa.me/523333777337?text=' + encodeURIComponent('Hola, vengo de inmobiliaria.pro y quiero hablar con un asesor') }
   };

@@ -23,6 +23,8 @@ def main():
     if len(datos) < 100 or (previo and len(datos) < len(previo) * 0.5):
         print(f"[FRENO] La bolsa trae {len(datos)} fichas (antes {len(previo)}): se conserva el inventario vigente")
         return 0
+    # Política de Acierta Max (oct-2026): no se publican rentas menores de $11,000 al mes
+    datos = [d for d in datos if not (d.get("operacion") == "RENTA" and (d.get("precio") or 0) and d["precio"] < 11000)]
     for d in datos:
         d["liga"] = f"{SITIO}/ficha.html?eb={d['eb']}&op={d['operacion']}"
     datos.sort(key=lambda f: (f["operacion"], f["municipio"], -(f.get("precio") or 0)))

@@ -25,6 +25,12 @@ def main():
         return 0
     # Política de Acierta Max (oct-2026): no se publican rentas menores de $11,000 al mes
     datos = [d for d in datos if not (d.get("operacion") == "RENTA" and (d.get("precio") or 0) and d["precio"] < 11000)]
+    try:   # limpieza de calidad: sin no-vivienda, terrenos sin recámaras, datos imposibles marcados, títulos legibles
+        import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__)))
+        from limpieza import limpiar_inventario
+        datos, _res = limpiar_inventario(datos); print("Limpieza:", _res, flush=True)
+    except Exception as _e:
+        print("Limpieza no aplicada:", _e, flush=True)
     for d in datos:
         d["liga"] = f"{SITIO}/ficha.html?eb={d['eb']}&op={d['operacion']}"
     datos.sort(key=lambda f: (f["operacion"], f["municipio"], -(f.get("precio") or 0)))

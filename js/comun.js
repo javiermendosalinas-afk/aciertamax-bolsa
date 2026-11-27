@@ -53,9 +53,64 @@
   AM.clave = p => p.eb + '-' + (p.operacion === 'RENTA' ? 'R' : 'V');
   AM.buscar = (todas, clave) => todas.find(p => AM.clave(p) === clave) || todas.find(p => p.eb === clave) || null;
   AM.fichaUrl = p => 'ficha.html?eb=' + encodeURIComponent(p.eb) + '&op=' + p.operacion;
+  // Títulos que solo repiten la colonia ("Parques de Tesistán Zapopan Jalisco") o dicen "Casa en venta":
+  // se muestran como "Casa en venta en Parques de Tesistán · 3 recámaras".
+  const GENERICOS = /^(casa|departamento|depto|terreno|local|oficina|bodega|propiedad|inmueble)s?( (en|de))? ?(venta|renta)?( (en|de) (venta|renta))?$/;
+  AM.mejorarTitulo = function (p) {
+    const t = (p.titulo || '').trim(), n = AM.norm(t), col = AM.norm(p.colonia || '');
+    const resto = col && n.startsWith(col) ? n.slice(col.length).replace(/\b(zapopan|guadalajara|tlaquepaque|san pedro|tonala|tlajomulco( de zuniga)?|el salto|jalisco|jal|mexico|col(onia)?|fracc(ionamiento)?)\b/g, '').replace(/[^a-z0-9]/g, '') : null;
+    const generico = !t || t.length < 12 || GENERICOS.test(n) || resto === '';
+    if (!generico) return p;
+    const SING = { casa: 'casa', departamento: 'departamento', terreno: 'terreno', local: 'local comercial', oficina: 'oficina', bodega: 'bodega', edificio: 'edificio' };
+    const g = AM.grupoDe(p.tipo), tipo = SING[g] || 'propiedad';
+    const op = p.operacion === 'RENTA' ? 'en renta' : 'en venta';
+    const nuevo = tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase() + ' ' + op + (p.colonia ? ' en ' + p.colonia : p.municipio ? ' en ' + p.municipio : '') +
+      (p.recamaras && (g === 'casa' || g === 'departamento') ? ' · ' + p.recamaras + ' recámara' + (p.recamaras > 1 ? 's' : '') : '');
+    return Object.assign(p, { titulo_orig: t, titulo: nuevo, titulo_generico: true });
+  };
+  // Quita de las descripciones de otras inmobiliarias sus datos de contacto y su nombre: el cliente trata con Acierta.
+  AM.limpiarDescripcion = function (txt) {
+    if (!txt) return '';
+    const fuera = /(inmobiliaria|real ?estate|bienes ra[ií]ces|brokers?|realtor|asesor(a|es)? inmobiliari|grupo inmobiliario|ll[aá]ma(me|nos)|cont[aá]cta(me|nos)|escr[ií]be(me|nos)|whats ?app|informes|m[aá]s informaci[oó]n al|agenda tu cita|ag[eé]ndala|www\.|https?:|@|facebook|instagram|tiktok)/i;
+    return String(txt).split(/\n/).filter(l => !fuera.test(l))
+      .map(l => l.replace(/(\+?52[\s.-]*)?(\(?\d{2,3}\)?[\s.-]*)?\d{3,4}[\s.-]?\d{4}/g, '').replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, '').trimEnd())
+      .join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  };
+
 
   // Ordena una lista. `orden`: precio_asc | precio-desc | m2_desc | recamaras-desc ...
-  AM.ordenar = function (lista, orden, fotoPrimero) {
+  // Calidad de una publicación para el orden "recomendadas": primero lo que un cliente sí querría ver
+  // (desarrollos verificados, foto, datos completos, título claro) y al final remates y precios fuera de lugar.
+  const REMATE = /remate|recuperaci[oó]n bancaria|adjudicad|cesi[oó]n de derechos|cartera vencida|juicio|litigio|sin posesi[oó]n|solo contado bancario|inversionistas? (con|de) contado/i;
+  let _medCache = null, _medN = -1;
+  function medianasPm2(todas) {
+    if (_medCache && _medN === todas.length) return _medCache;
+    const g = {};
+    todas.forEach(p => { const v = AM.precioM2(p); if (!v) return; const k = p.operacion + '|' + AM.grupoDe(p.tipo) + '|' + p.municipio; (g[k] = g[k] || []).push(v); });
+    _medCache = {}; Object.entries(g).forEach(([k, v]) => { if (v.length >= 12) { v.sort((a, b) => a - b); _medCache[k] = v[Math.floor(v.length / 2)]; } });
+    _medN = todas.length; return _medCache;
+  }
+  AM.calidad = function (p, med) {
+    let s = 0;
+    if (AM.verificada && AM.verificada(p)) s += 6;
+    if (p.foto) s += 3;
+    if (p.m2) s += 1;
+    if (AM.segDe(p) !== 'vivienda' || (p.recamaras && p.banos)) s += 1;
+    if (!p.titulo_generico) s += 1;
+    if (REMATE.test((p.titulo_orig || p.titulo || '') + ' ' + (p.nota || ''))) s -= 6;
+    const v = AM.precioM2(p), m = med && med[p.operacion + '|' + AM.grupoDe(p.tipo) + '|' + p.municipio];
+    if (v && m && v < m * 0.35) s -= 4;          // muy por debajo de lo normal: remate o dato mal capturado
+    return s;
+  };
+  AM.ordenar = function (lista, orden, fotoPrimero, pmax) {
+    if (!orden || orden === 'recomendadas') {
+      const med = medianasPm2(lista);
+      lista.forEach(p => { p._q = AM.calidad(p, med); });
+      // Mismo nivel de calidad: con presupuesto, primero lo más cercano a él; sin presupuesto, de menor a mayor precio.
+      lista.sort((a, b) => (b._q - a._q) || (pmax ? (b.precio || 0) - (a.precio || 0) : (a.precio || 0) - (b.precio || 0)));
+      const mx = lista.filter(AM.esMXN), us = lista.filter(p => !AM.esMXN(p)); lista.length = 0; lista.push(...mx, ...us);
+      return lista;
+    }
     const [campo, dir] = String(orden || 'precio-asc').replace('_', '-').split('-');
     const s = dir === 'desc' ? -1 : 1;
     lista.sort((a, b) => ((a[campo] || 0) - (b[campo] || 0)) * s);

@@ -188,7 +188,7 @@ fetch('inventario-meta.json').then(r => r.ok ? r.json() : null).catch(() => null
   .then(meta => { META = meta; return fetch('data.json'); })
   .then(r => r.json())
   .then(data => {
-    ALL_PROPS = data;
+    ALL_PROPS = Array.isArray(data) ? data.map(AM.mejorarTitulo) : data;
     renderStats();
     armarColonias();
     applyFilters();

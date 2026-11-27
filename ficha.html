@@ -60,6 +60,7 @@ const ZONA={'Zapopan':'Zapopan es el municipio con más oferta. Por Valle Real, 
  'Tlajomulco de Zúñiga':'En Tlajomulco hay fraccionamientos nuevos con buen precio por m². Calcula tus traslados en hora pico por López Mateos o la carretera a Chapala.'};
 const q=new URLSearchParams(location.search), clave=(q.get('eb')||'').toUpperCase(), op=(q.get('op')||'VENTA').toUpperCase().startsWith('R')?'R':'V';
 const $=id=>document.getElementById(id), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const limpiarDesc=t=>{if(!t)return'';const fuera=/(inmobiliaria|real ?estate|bienes ra[ií]ces|brokers?|realtor|asesor(a|es)? inmobiliari|grupo inmobiliario|ll[aá]ma(me|nos)|cont[aá]cta(me|nos)|escr[ií]be(me|nos)|whats ?app|informes|m[aá]s informaci[oó]n al|agenda tu cita|ag[eé]ndala|www\.|https?:|@|facebook|instagram|tiktok)/i;return String(t).split(/\n/).filter(l=>!fuera.test(l)).map(l=>l.replace(/(\+?52[\s.-]*)?(\(?\d{2,3}\)?[\s.-]*)?\d{3,4}[\s.-]?\d{4}/g,'').replace(/[\w.+-]+@[\w-]+\.[\w.]+/g,'').trimEnd()).join('\n').replace(/\n{3,}/g,'\n\n').trim();};
 const din=v=>'$'+Math.round(v||0).toLocaleString('es-MX');
 const sup=p=>p.g==='t'?p.t:(p.s||0), pm2=p=>sup(p)>0?p.p/sup(p):null, mediana=a=>{a=a.filter(Boolean).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:null};
 function visor(fotos,i){const v=document.createElement('div');v.className='visor';v.innerHTML='<button class="x" aria-label="Cerrar">×</button><button class="a" aria-label="Anterior">‹</button><img alt=""><button class="s" aria-label="Siguiente">›</button><div class="n"></div>';
@@ -98,7 +99,7 @@ Promise.all([fetch('/presupuesto/buscador.json').then(r=>r.json()).catch(()=>[])
    <div class="precio">${din(p.p)}${renta?' al mes':''}</div><div class="chips">${chips.map(c=>`<span>${esc(c)}</span>`).join('')}</div>
    ${charla('Sofía',poseS,`<p><b>Te la explico:</b></p>${bueno.length?`<p>👍 Lo bueno: ${bueno.join('; ')}.</p>`:''}<p>🎯 Es ideal para ${para}.</p><div class="tip">💡 ${tip}</div>`)}
    ${charla('Diego',ojo.length?'DL':'D',`${ojo.length?`<p>⚠️ <b>Ojo:</b> ${ojo.join('; ')}.</p>`:''}<p>${esc(ZONA[p.m]||'')}</p><p>¿Te late? Toca <b>♥ Quiero verla</b> y te dejo listo con un asesor. Y antes de dar un peso, pide que te la revisemos.</p>`,true)}
-   ${d.descripcion?`<section class="fi-caja"><h2>Lo que dice el anuncio</h2><div class="fi-desc${d.descripcion.length>600?' corta':''}" id="desc">${esc(d.descripcion)}</div>${d.descripcion.length>600?'<button class="fi-mas" id="mas">Leer todo</button>':''}</section>`:''}
+   ${(d.descripcion=limpiarDesc(d.descripcion))?`<section class="fi-caja"><h2>Lo que dice el anuncio</h2><div class="fi-desc${d.descripcion.length>600?' corta':''}" id="desc">${esc(d.descripcion)}</div>${d.descripcion.length>600?'<button class="fi-mas" id="mas">Leer todo</button>':''}</section>`:''}
    ${amen.length?`<section class="fi-caja"><h2>Amenidades</h2><div class="chips">${amen.map(a=>`<span>${esc(a)}</span>`).join('')}</div></section>`:''}
   </div><div>
    ${p.a?`<section class="fi-caja" style="margin-top:0"><h2>Dónde está</h2><div id="fiMapa"></div><p style="color:#5b6575;font-size:.85rem;margin:8px 0 0">Ubicación aproximada.</p></section>`:''}
